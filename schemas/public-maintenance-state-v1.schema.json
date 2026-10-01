@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nuxtjp://public/maintenance-state/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "generatedAt", "expiresAt", "global", "services"],
+  "properties": {
+    "schema": { "const": "nuxtjp://public/maintenance-state/v1" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "global": { "$ref": "#/$defs/status" },
+    "services": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/target" }
+    }
+  },
+  "$defs": {
+    "message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ja", "en"],
+      "properties": {
+        "ja": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "en": { "type": "string", "minLength": 1, "maxLength": 240 }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "message", "expiresAt"],
+      "properties": {
+        "state": { "enum": ["operational", "maintenance"] },
+        "message": { "$ref": "#/$defs/message" },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["serviceId", "state", "message", "expiresAt"],
+      "properties": {
+        "serviceId": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,63}$" },
+        "state": { "enum": ["operational", "maintenance"] },
+        "message": { "$ref": "#/$defs/message" },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

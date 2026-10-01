@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nuxtjp://localized-site/site-config/v1",
+  "title": "NuxtJP localized public site",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "siteId",
+    "serviceId",
+    "origin",
+    "audienceScope",
+    "defaultLocale",
+    "locales",
+    "externalActions",
+    "content"
+  ],
+  "properties": {
+    "schema": { "const": "nuxtjp://localized-site/site-config/v1" },
+    "siteId": { "$ref": "#/$defs/id" },
+    "serviceId": { "$ref": "#/$defs/id" },
+    "origin": { "type": "string", "format": "uri", "maxLength": 500 },
+    "audienceScope": { "enum": ["japan", "global"] },
+    "defaultLocale": { "$ref": "#/$defs/locale" },
+    "fallbackLocale": { "$ref": "#/$defs/locale" },
+    "prefixDefaultLocale": { "type": "boolean" },
+    "locales": {
+      "type": "array",
+      "prefixItems": [{ "const": "ja" }, { "const": "en" }],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "externalActions": { "const": false },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ja", "en"],
+      "properties": {
+        "ja": { "$ref": "#/$defs/localeContent" },
+        "en": { "$ref": "#/$defs/localeContent" }
+      }
+    }
+  },
+  "$defs": {
+    "locale": { "enum": ["ja", "en"] },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "text": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "notice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "summary"],
+      "properties": {
+        "label": { "$ref": "#/$defs/text" },
+        "summary": { "$ref": "#/$defs/text" }
+      }
+    },
+    "feature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "summary"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "$ref": "#/$defs/text" },
+        "summary": { "$ref": "#/$defs/text" }
+      }
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "body"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "$ref": "#/$defs/text" },
+        "body": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/text" },
+          "minItems": 1
+        }
+      }
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "title", "summary", "sections"],
+      "properties": {
+        "slug": { "type": "string", "pattern": "^/docs(?:/.*)?$" },
+        "title": { "$ref": "#/$defs/text" },
+        "summary": { "$ref": "#/$defs/text" },
+        "sections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/section" },
+          "minItems": 1
+        }
+      }
+    },
+    "docs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overview", "gettingStarted", "security"],
+      "properties": {
+        "overview": { "$ref": "#/$defs/document" },
+        "gettingStarted": { "$ref": "#/$defs/document" },
+        "security": { "$ref": "#/$defs/document" }
+      }
+    },
+    "localeContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "brand",
+        "tagline",
+        "summary",
+        "features",
+        "docs",
+        "privacy",
+        "contact"
+      ],
+      "properties": {
+        "brand": { "$ref": "#/$defs/text" },
+        "tagline": { "$ref": "#/$defs/text" },
+        "summary": { "$ref": "#/$defs/text" },
+        "features": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/feature" },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "docs": { "$ref": "#/$defs/docs" },
+        "privacy": { "$ref": "#/$defs/notice" },
+        "contact": { "$ref": "#/$defs/notice" }
+      }
+    }
+  }
+}

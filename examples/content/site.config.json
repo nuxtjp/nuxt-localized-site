@@ -1,0 +1,149 @@
+{
+  "schema": "nuxtjp://localized-site/site-config/v1",
+  "siteId": "sample-service-site",
+  "serviceId": "sample-service",
+  "origin": "https://example.test",
+  "audienceScope": "japan",
+  "defaultLocale": "ja",
+  "fallbackLocale": "en", "prefixDefaultLocale": false,
+  "locales": ["ja", "en"],
+  "externalActions": false,
+  "content": {
+    "ja": {
+      "brand": "サンプルサービス",
+      "tagline": "ローカル契約から構築する公開サイト",
+      "summary": "日本語と英語の内容を同じ構造で管理する例です。",
+      "features": [
+        {
+          "id": "local-first",
+          "title": "ローカル完結",
+          "summary": "ビルド時に明示したコンテンツだけを読み取ります。"
+        },
+        {
+          "id": "typed-contract",
+          "title": "型付き契約",
+          "summary": "同じ識別子と文書構造を二言語で検証します。"
+        },
+        {
+          "id": "seo-ready",
+          "title": "SEO対応",
+          "summary": "lang、canonical、hreflangをURL戦略から生成します。"
+        }
+      ],
+      "docs": {
+        "overview": {
+          "slug": "/docs",
+          "title": "概要",
+          "summary": "サービスの構成と責務を説明します。",
+          "sections": [
+            {
+              "id": "purpose",
+              "title": "目的",
+              "body": ["公開情報を小さな契約として安全に提供します。"]
+            }
+          ]
+        },
+        "gettingStarted": {
+          "slug": "/docs/getting-started",
+          "title": "はじめに",
+          "summary": "最小構成でサイトをビルドする手順です。",
+          "sections": [
+            {
+              "id": "install",
+              "title": "導入",
+              "body": ["vendoredパッケージと設定ファイルを配置します。"]
+            }
+          ]
+        },
+        "security": {
+          "slug": "/docs/security",
+          "title": "セキュリティ",
+          "summary": "情報境界と外部操作の方針です。",
+          "sections": [
+            {
+              "id": "boundary",
+              "title": "境界",
+              "body": ["モジュールは外部通信や外部操作を実装しません。"]
+            }
+          ]
+        }
+      },
+      "privacy": {
+        "label": "プライバシー",
+        "summary": "公開承認済みの情報のみを表示します。"
+      },
+      "contact": {
+        "label": "お問い合わせ",
+        "summary": "連絡方法はサービス運営者が別途定めます。"
+      }
+    },
+    "en": {
+      "brand": "Sample Service",
+      "tagline": "A public site built from a local contract",
+      "summary": "This example maintains Japanese and English in one structure.",
+      "features": [
+        {
+          "id": "local-first",
+          "title": "Local first",
+          "summary": "Only explicitly selected content is read during the build."
+        },
+        {
+          "id": "typed-contract",
+          "title": "Typed contract",
+          "summary": "Both locales share validated identifiers and document structure."
+        },
+        {
+          "id": "seo-ready",
+          "title": "SEO ready",
+          "summary": "URL policy generates lang, canonical, and hreflang metadata."
+        }
+      ],
+      "docs": {
+        "overview": {
+          "slug": "/docs",
+          "title": "Overview",
+          "summary": "Understand the service structure and responsibility.",
+          "sections": [
+            {
+              "id": "purpose",
+              "title": "Purpose",
+              "body": ["Publish approved information through a small contract."]
+            }
+          ]
+        },
+        "gettingStarted": {
+          "slug": "/docs/getting-started",
+          "title": "Getting started",
+          "summary": "Build the site from the minimum consumer files.",
+          "sections": [
+            {
+              "id": "install",
+              "title": "Install",
+              "body": ["Place the vendored package and site configuration."]
+            }
+          ]
+        },
+        "security": {
+          "slug": "/docs/security",
+          "title": "Security",
+          "summary": "Review information boundaries and external-action policy.",
+          "sections": [
+            {
+              "id": "boundary",
+              "title": "Boundary",
+              "body": ["The module implements no external communication or action."]
+            }
+          ]
+        }
+      },
+      "privacy": {
+        "label": "Privacy",
+        "summary": "Only information approved for publication is rendered."
+      },
+      "contact": {
+        "label": "Contact",
+        "summary": "The service operator defines the contact channel separately."
+      }
+    }
+  }
+}
