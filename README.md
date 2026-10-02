@@ -1,16 +1,60 @@
 # @nuxtjp/localized-site
 
-A contract-first Nuxt module for small Japanese and English public service
-sites. It validates one local `site.config.json`, then injects the layout,
-runtime, SEO metadata, and four pages:
+設定ファイルから日本語・英語の紹介、導入、セキュリティ案内ページを構成できます。
 
-- `/`
-- `/docs`
-- `/docs/getting-started`
-- `/docs/security`
+## 利用前の確認
 
-The non-default locale is prefixed by default, such as `/en/docs`. Setting
-`prefixDefaultLocale` to `true` prefixes both `ja` and `en`.
+実装済みの範囲、必要な依存関係、検証コマンドを以下の英語説明に併記しています。操作・配備・公開は、それぞれの権限と設定を確認してから実施してください。
+
+## 導入・使い方
+
+以下は現行インターフェースの利用例です。ローカル成果物の参照がある場合は、必要な版の成果物を先に準備してください。パッケージの公開配布は今回の作業では行いません。
+
+## Typed messages
+
+Consumer-specific UI messages can share the same fallback policy:
+
+```ts
+const messages = defineLocalizedMessages({
+  ja: { save: '保存', cancel: 'キャンセル' },
+  en: { save: 'Save', cancel: 'Cancel' }
+})
+
+const { t } = useLocalizedMessages(messages)
+t('save')
+```
+
+Missing or extra English keys fail TypeScript validation. At runtime an empty
+current-locale message falls back to `fallbackLocale`, then `defaultLocale`.
+
+## English
+
+Build a small Japanese/English service website from one validated content configuration.
+
+## What you can do
+
+- Generate overview, documentation, getting-started and security pages.
+- Apply locale routing, layout and SEO metadata.
+
+## Current scope
+
+Content is caller-owned data. Distribution of the versioned package is not activated yet; source preparation is separate from publishing a site.
+
+Package distribution is not activated by this documentation. Use the checked-in source and the declared dependency versions; published availability must be verified separately.
+
+## Getting started
+
+Use `pnpm@10.29.3` and the Node.js version declared in `engines` in `package.json`. Run from this repository:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm validate:example
+pnpm typecheck
+pnpm test
+pnpm build:module
+```
+
+## Examples and interface details
 
 ## Consumer
 
@@ -43,61 +87,8 @@ Place `site.config.json` at the declared content root. The contract requires:
 See [the complete example](examples/content/site.config.json) and the
 [published schema](schemas/localized-site-v1.schema.json).
 
-## Validation
+## Documentation and source
 
-The CLI never searches sibling repositories. A content root is mandatory:
+[Usage guide](docs/getting-started.md)
 
-```bash
-pnpm exec nuxtjp-localized-site validate --content-root ./content
-```
-
-Validation rejects unknown fields, incomplete locales, mismatched feature or
-section identifiers, unsafe identifiers, incorrect document slugs, executable
-external-action declarations, and invalid origins.
-
-## Public maintenance notice
-
-The shared layout reads same-origin `/maintenance.json` after mount and shows
-the global or matching `serviceId` notice. The closed
-[`public-maintenance-state-v1`](schemas/public-maintenance-state-v1.schema.json)
-contract contains only bounded Japanese and English messages. Missing,
-unreachable, unknown-field, duplicate-service, or expired documents do not
-block the site. Cross-origin status endpoints and credentials are unsupported.
-
-## Typed messages
-
-Consumer-specific UI messages can share the same fallback policy:
-
-```ts
-const messages = defineLocalizedMessages({
-  ja: { save: '保存', cancel: 'キャンセル' },
-  en: { save: 'Save', cancel: 'Cancel' }
-})
-
-const { t } = useLocalizedMessages(messages)
-t('save')
-```
-
-Missing or extra English keys fail TypeScript validation. At runtime an empty
-current-locale message falls back to `fallbackLocale`, then `defaultLocale`.
-
-## URL and SEO policy
-
-The active URL determines `<html lang>`. The module emits one canonical link,
-`ja`, `en`, and `x-default` hreflang links, plus description and Open Graph
-metadata. Query strings and fragments do not enter canonical URLs.
-
-## Local verification
-
-```bash
-pnpm install --offline --frozen-lockfile
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm validate:example
-pnpm pack
-```
-
-The playground is a real minimal Nuxt host using only the module and example
-contract. The package performs no fetch, provider access, discovery, external
-write, or implicit content-root selection.
+[Examples](examples) · [Schemas](schemas) · [Implementation and public interfaces](src) · [Verification cases](test) · [Contributing](CONTRIBUTING.md) · [Security reporting](SECURITY.md) · [License](LICENSE) · [Attribution notices](NOTICE)
