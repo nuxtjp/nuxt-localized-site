@@ -1,12 +1,12 @@
 # @nuxtjp/localized-site
 
-## 日本語
+[日本語](README.ja.md)
 
-日本語・英語の紹介サイトを1つの検証済み設定から構成します。
-`/`、`/docs`、`/docs/getting-started`、`/docs/security`と各英語ページを生成し、言語切替とSEOを適用します。
+Generate a Japanese/English introduction site from one validated configuration. The module supplies `/`, `/docs`, `/docs/getting-started`, `/docs/security` and their English counterparts, locale links and SEO metadata.
 
-公開準備中です。以下のregistry導入は`@nuxtjp/localized-site@0.1.0`の公開確認後に使います。
-Node.js 22.19以降または24.11以降、Nuxt 4.5.1以降の4系、Vue `^3.5.40`を使用してください。
+## Install and configure
+
+Version `0.1.0` is published on npm. Use Node.js 22.19+ or 24.11+, Nuxt 4.5.1+ in major 4, and Vue `^3.5.40`.
 
 ```sh
 pnpm add --save-exact @nuxtjp/localized-site@0.1.0 nuxt@4.5.1 vue@3.5.43
@@ -18,29 +18,18 @@ export default defineNuxtConfig({
 })
 ```
 
-[`site.config.json`の汎用サンプル](examples/content/site.config.json)を指定したcontent rootに置き、サイト固有の内容に置き換えます。
-`siteId`、`serviceId`、`origin`、`audienceScope`、ja/enのコンテンツ、3つのfeatures、導入・セキュリティ文書、privacy/contact説明、`externalActions: false`が必須です。
+Set `contentRoot` explicitly. Copy the [generic configuration](examples/content/site.config.json) there as `site.config.json`, and replace it with the site's own content.
+The configuration requires `siteId`, `serviceId`, `origin`, `audienceScope`, complete ja/en content, exactly three features, getting-started and security documents, privacy/contact notices, and `externalActions: false`.
 
 ```sh
 pnpm exec nuxtjp-localized-site validate --content-root .
 pnpm exec nuxt build
 ```
 
-privacy/contactは説明文として表示し、未設定のリンクや操作を生成しません。
-メンテナンス表示はブラウザから同一originの`/maintenance.json`を読みます。取得・形式・期限の検証に失敗した場合は表示せず、本文と言語切替は利用できます。
-配布物だけを試す際は、registry版の代わりに承認されたTGZをインストールしてください。サイトの公開やregistry設定はこの手順に含みません。
+## Behavior and limits
 
-## English
-
-Generate a Japanese/English introduction site from one validated configuration.
-The module supplies landing, overview, getting-started and security pages, locale links and SEO metadata.
-
-Publication is pending. After verifying registry availability, use the installation command above with Node.js 22.19+ or 24.11+, Nuxt 4.5.1+ in major 4, and Vue `^3.5.40`.
-Set `contentRoot` explicitly, copy the generic example to that directory as `site.config.json`, replace its content, validate it, then build the host application.
-The configuration requires site/service identifiers, origin, audience scope, complete ja/en content, exactly three features, documents and privacy/contact notices, and `externalActions: false`.
-
-Privacy/contact notices are text; the module creates no unset links or actions.
-In the browser, the optional maintenance notice reads same-origin `/maintenance.json`. Failed retrieval, invalid data or expired data hides the notice while the site remains usable.
+Privacy/contact notices are text. The module creates no unset links or actions.
+In the browser, the optional maintenance notice reads same-origin `/maintenance.json`. Failed retrieval, invalid data or expired data hides that notice; the site and locale switching remain usable.
 For archive testing, install the exact reviewed TGZ instead of the registry version. These commands do not publish a website or configure registry access.
 
 ## Typed messages
@@ -56,7 +45,7 @@ t('save')
 
 English keys must match Japanese keys. Empty messages fall back to `fallbackLocale`, then `defaultLocale`.
 
-## Development / 開発
+## Development
 
 ```sh
 pnpm install --frozen-lockfile
@@ -67,8 +56,11 @@ pnpm validate:example
 pnpm pack
 ```
 
-`prepack` runs the tests, typecheck, build and example validation. Verify the actual archive in a separate host before release.
-See [usage](docs/getting-started.md), [schema](schemas/localized-site-v1.schema.json), [tests](test), and [security reporting](SECURITY.md).
+`prepack` runs tests, typecheck, build and example validation. Verify the actual archive in a separate host before a release.
 
-Code: [Apache-2.0](LICENSE). Retained prior grants: [LICENSE-PREVIOUS](LICENSE-PREVIOUS). [NOTICE](NOTICE) preserves attribution.
-[LICENSE-ASSETS](LICENSE-ASSETS) retains separate terms for covered brand/content assets; it does not change the code license or grant rights to third-party/site-owned content.
+## Documentation and license
+
+[Usage guide](https://github.com/nuxtjp/nuxt-localized-site/blob/main/docs/getting-started.md) · [Schema](schemas/localized-site-v1.schema.json) · [Tests](https://github.com/nuxtjp/nuxt-localized-site/tree/main/test) · [Security reporting](https://github.com/nuxtjp/nuxt-localized-site/blob/main/SECURITY.md)
+
+Code: [Apache-2.0](LICENSE). [LICENSE-PREVIOUS](LICENSE-PREVIOUS) retains prior grants, and [NOTICE](NOTICE) preserves attribution.
+[LICENSE-ASSETS](LICENSE-ASSETS) retains separate terms for covered brand/content assets. It does not change the code license or grant rights to third-party or site-owned content.
