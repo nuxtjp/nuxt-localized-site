@@ -1,6 +1,12 @@
-name: Publish npm package
+name: Publish reviewed npm archive
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [prepare, bootstrap, oidc]
+        default: prepare
+        required: true
 permissions:
   contents: read
 concurrency:
@@ -8,67 +14,33 @@ concurrency:
   cancel-in-progress: false
 jobs:
   prepare:
-    if: vars.REGISTRY_PUBLISH_ENABLED == 'true' && github.event.repository.private == false
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    permissions:
-      contents: read
     outputs:
       artifact-id: ${{ steps.upload.outputs.artifact-id }}
       archive-sha256: ${{ steps.binding.outputs.archive-sha256 }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Require the reviewed source revision
+      - name: Require approved public source and release tag
         env:
+          RELEASE_MODE: ${{ inputs.mode }}
           APPROVED_SHA: ${{ vars.REGISTRY_SECURITY_APPROVED_SHA }}
-        run: |
-          test "$APPROVED_SHA" = "$GITHUB_SHA"
-          git merge-base --is-ancestor HEAD origin/main
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+          PUBLISH_ENABLED: ${{ vars.REGISTRY_PUBLISH_ENABLED }}
+          BOOTSTRAP_ENABLED: ${{ vars.REGISTRY_BOOTSTRAP_ENABLED }}
+        run: python3 .github/scripts/release-gate.py
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: '24.15.0'
-      - name: Install the reviewed package manager
-        run: |
-          npm install --global npm@11.5.1
-          MANAGER=$(node -e 'const p=require("./package.json"); const m=p.packageManager || "npm@11.5.1"; if(!/^(?:pnpm@10\.\d+\.\d+|npm@11\.5\.1)$/.test(m)) throw Error("Pinned pnpm 10 or npm 11.5.1 required"); process.stdout.write(m)')
-          npm install --global "$MANAGER"
-          echo "PACKAGE_MANAGER=${MANAGER%%@*}" >> "$GITHUB_ENV"
-      - name: Check registry metadata and release tag
-        env:
-          RELEASE_TAG_PREFIX: ${{ vars.REGISTRY_NPM_TAG_PREFIX || 'v' }}
-        run: |
-          python3 scripts/check-public-package.py npm
-          VERSION=$(node -p 'require("./package.json").version')
-          test "$GITHUB_REF_TYPE" = tag
-          test "$GITHUB_REF_NAME" = "${RELEASE_TAG_PREFIX}${VERSION}"
-      - name: Build, test, and pack the frozen source
-        run: |
-          if test "$PACKAGE_MANAGER" = pnpm; then
-            test -f pnpm-lock.yaml
-            pnpm install --frozen-lockfile
-          else
-            test -f package-lock.json
-            npm ci
-          fi
-          "$PACKAGE_MANAGER" test
-          "$PACKAGE_MANAGER" run typecheck
-          "$PACKAGE_MANAGER" run --if-present build
-          "$PACKAGE_MANAGER" run validate:example
-          mkdir -p "$RUNNER_TEMP/package-release"
-          npm pack --json --pack-destination "$RUNNER_TEMP/package-release" > "$RUNNER_TEMP/package-pack.json"
-          ARCHIVE=$(node -e 'const p=require(process.env.RUNNER_TEMP+"/package-pack.json");if(p.length!==1)throw Error("One archive required");process.stdout.write(p[0].filename)')
-          python3 scripts/check-public-package.py npm --archive "$RUNNER_TEMP/package-release/$ARCHIVE"
-      - name: Verify the inspected archive in a separate host
-        run: |
-          ARCHIVE=$(node -e 'process.stdout.write(require(process.env.RUNNER_TEMP+"/package-pack.json")[0].filename)')
-          node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/package-release/$ARCHIVE"
-      - name: Bind archive to the reviewed source
+          package-manager-cache: false
+      - name: Install pinned managers, build and inspect without credentials
+        run: bash .github/scripts/prepare-npm-release.sh
+      - name: Bind archive to reviewed source
         id: binding
         run: node .github/scripts/release-archive.mjs prepare "$RUNNER_TEMP/package-release"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         id: upload
         with:
           name: npm-release-${{ github.sha }}-${{ github.run_attempt }}
@@ -78,7 +50,7 @@ jobs:
           overwrite: false
   publish:
     needs: prepare
-    if: vars.REGISTRY_PUBLISH_ENABLED == 'true' && github.event.repository.private == false
+    if: inputs.mode != 'prepare' && vars.REGISTRY_PUBLISH_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: npm-public
@@ -86,26 +58,42 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - name: Recheck source, gates and registry state
+        env:
+          RELEASE_MODE: ${{ inputs.mode }}
+          APPROVED_SHA: ${{ vars.REGISTRY_SECURITY_APPROVED_SHA }}
+          PUBLISH_ENABLED: ${{ vars.REGISTRY_PUBLISH_ENABLED }}
+          BOOTSTRAP_ENABLED: ${{ vars.REGISTRY_BOOTSTRAP_ENABLED }}
+        run: python3 .github/scripts/release-gate.py
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: '24.15.0'
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - run: npm install --global npm@11.12.1
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           artifact-ids: ${{ needs.prepare.outputs.artifact-id }}
           merge-multiple: true
           path: ${{ runner.temp }}/package-release
-      - name: Verify the prepared archive and publish without lifecycle
+      - name: Verify prepared archive before authentication
         env:
           EXPECTED_ARCHIVE_SHA256: ${{ needs.prepare.outputs.archive-sha256 }}
-          APPROVED_SHA: ${{ vars.REGISTRY_SECURITY_APPROVED_SHA }}
-          RELEASE_TAG_PREFIX: ${{ vars.REGISTRY_NPM_TAG_PREFIX || 'v' }}
+        run: node .github/scripts/release-archive.mjs verify "$RUNNER_TEMP/package-release"
+      - name: First publication with this repository's temporary token
+        if: inputs.mode == 'bootstrap'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
         run: |
-          test "$APPROVED_SHA" = "$GITHUB_SHA"
-          test "$GITHUB_REF_TYPE" = tag
-          test "$GITHUB_REF_NAME" = "${RELEASE_TAG_PREFIX}0.1.0"
-          node .github/scripts/release-archive.mjs verify "$RUNNER_TEMP/package-release"
+          test -n "$NODE_AUTH_TOKEN"
+          npm whoami --registry=https://registry.npmjs.org > /dev/null
+          node --input-type=module -e 'const r=await fetch("https://registry.npmjs.org/"+encodeURIComponent("@nuxtjp/localized-site"),{headers:{authorization:"Bearer "+process.env.NODE_AUTH_TOKEN},redirect:"error"});if(r.status!==404)throw Error("Bootstrap requires an authenticated missing package; inspect existing visibility/ownership")'
           npm publish "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.1.0.tgz" --registry=https://registry.npmjs.org --access public --provenance --ignore-scripts
+      - name: Subsequent publication with repository OIDC identity
+        if: inputs.mode == 'oidc'
+        run: npm publish "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.1.0.tgz" --registry=https://registry.npmjs.org --access public --provenance --ignore-scripts
