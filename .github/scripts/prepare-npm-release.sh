@@ -10,6 +10,7 @@ MANAGER=$(node -p 'require("./package.json").packageManager')
 if test "$MANAGER" = pnpm@10.29.3; then
   npm install --global pnpm@10.29.3
   pnpm install --frozen-lockfile
+  pnpm run build:validator
   pnpm exec nuxt prepare playground
   pnpm pack --pack-destination "$RUNNER_TEMP/package-release"
   node -e 'const fs=require("node:fs"),p=require("./package.json");fs.writeFileSync(process.env.RUNNER_TEMP+"/package-pack.json",JSON.stringify([{name:p.name,version:p.version,filename:"nuxtjp-localized-site-0.1.0.tgz"}]))'
