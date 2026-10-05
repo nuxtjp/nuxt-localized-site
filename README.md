@@ -1,94 +1,74 @@
 # @nuxtjp/localized-site
 
-設定ファイルから日本語・英語の紹介、導入、セキュリティ案内ページを構成できます。
+## 日本語
 
-## 利用前の確認
+日本語・英語の紹介サイトを1つの検証済み設定から構成します。
+`/`、`/docs`、`/docs/getting-started`、`/docs/security`と各英語ページを生成し、言語切替とSEOを適用します。
 
-実装済みの範囲、必要な依存関係、検証コマンドを以下の英語説明に併記しています。操作・配備・公開は、それぞれの権限と設定を確認してから実施してください。
+公開準備中です。以下のregistry導入は`@nuxtjp/localized-site@0.1.0`の公開確認後に使います。
+Node.js 22.19以降または24.11以降、Nuxt 4.5.1以降の4系、Vue `^3.5.40`を使用してください。
 
-## 導入・使い方
+```sh
+pnpm add --save-exact @nuxtjp/localized-site@0.1.0 nuxt@4.5.1 vue@3.5.43
+```
 
-以下は現行インターフェースの利用例です。ローカル成果物の参照がある場合は、必要な版の成果物を先に準備してください。パッケージの公開配布は今回の作業では行いません。
+```ts
+export default defineNuxtConfig({
+  modules: [['@nuxtjp/localized-site', { contentRoot: '.' }]]
+})
+```
+
+[`site.config.json`の汎用サンプル](examples/content/site.config.json)を指定したcontent rootに置き、サイト固有の内容に置き換えます。
+`siteId`、`serviceId`、`origin`、`audienceScope`、ja/enのコンテンツ、3つのfeatures、導入・セキュリティ文書、privacy/contact説明、`externalActions: false`が必須です。
+
+```sh
+pnpm exec nuxtjp-localized-site validate --content-root .
+pnpm exec nuxt build
+```
+
+privacy/contactは説明文として表示し、未設定のリンクや操作を生成しません。
+メンテナンス表示はブラウザから同一originの`/maintenance.json`を読みます。取得・形式・期限の検証に失敗した場合は表示せず、本文と言語切替は利用できます。
+配布物だけを試す際は、registry版の代わりに承認されたTGZをインストールしてください。サイトの公開やregistry設定はこの手順に含みません。
+
+## English
+
+Generate a Japanese/English introduction site from one validated configuration.
+The module supplies landing, overview, getting-started and security pages, locale links and SEO metadata.
+
+Publication is pending. After verifying registry availability, use the installation command above with Node.js 22.19+ or 24.11+, Nuxt 4.5.1+ in major 4, and Vue `^3.5.40`.
+Set `contentRoot` explicitly, copy the generic example to that directory as `site.config.json`, replace its content, validate it, then build the host application.
+The configuration requires site/service identifiers, origin, audience scope, complete ja/en content, exactly three features, documents and privacy/contact notices, and `externalActions: false`.
+
+Privacy/contact notices are text; the module creates no unset links or actions.
+In the browser, the optional maintenance notice reads same-origin `/maintenance.json`. Failed retrieval, invalid data or expired data hides the notice while the site remains usable.
+For archive testing, install the exact reviewed TGZ instead of the registry version. These commands do not publish a website or configure registry access.
 
 ## Typed messages
-
-Consumer-specific UI messages can share the same fallback policy:
 
 ```ts
 const messages = defineLocalizedMessages({
   ja: { save: '保存', cancel: 'キャンセル' },
   en: { save: 'Save', cancel: 'Cancel' }
 })
-
 const { t } = useLocalizedMessages(messages)
 t('save')
 ```
 
-Missing or extra English keys fail TypeScript validation. At runtime an empty
-current-locale message falls back to `fallbackLocale`, then `defaultLocale`.
+English keys must match Japanese keys. Empty messages fall back to `fallbackLocale`, then `defaultLocale`.
 
-## English
-
-Build a small Japanese/English service website from one validated content configuration.
-
-## What you can do
-
-- Generate overview, documentation, getting-started and security pages.
-- Apply locale routing, layout and SEO metadata.
-
-## Current scope
-
-Content is caller-owned data. Distribution of the versioned package is not activated yet; source preparation is separate from publishing a site.
-
-Package distribution is not activated by this documentation. Use the checked-in source and the declared dependency versions; published availability must be verified separately.
-
-## Getting started
-
-Use `pnpm@10.29.3` and the Node.js version declared in `engines` in `package.json`. Run from this repository:
+## Development / 開発
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm validate:example
-pnpm typecheck
 pnpm test
-pnpm build:module
+pnpm typecheck
+pnpm build
+pnpm validate:example
+pnpm pack
 ```
 
-## Examples and interface details
+`prepack` runs the tests, typecheck, build and example validation. Verify the actual archive in a separate host before release.
+See [usage](docs/getting-started.md), [schema](schemas/localized-site-v1.schema.json), [tests](test), and [security reporting](SECURITY.md).
 
-## Consumer
-
-Store a versioned package artifact in the consumer rather than adding a source
-path dependency:
-
-```bash
-pnpm add ./vendor/nuxtjp-localized-site-0.1.0.tgz
-```
-
-The complete consumer configuration is intentionally small:
-
-```ts
-export default defineNuxtConfig({
-  modules: [['@nuxtjp/localized-site', {
-    contentRoot: '.'
-  }]]
-})
-```
-
-Place `site.config.json` at the declared content root. The contract requires:
-
-- `siteId`, `serviceId`, `origin`, and `audienceScope`;
-- a site-declared `defaultLocale` and exact `locales: ["ja", "en"]`;
-- localized brand, tagline, summary, and exactly three features;
-- localized overview, getting-started, and security documents;
-- localized privacy and contact notices;
-- `externalActions: false`.
-
-See [the complete example](examples/content/site.config.json) and the
-[published schema](schemas/localized-site-v1.schema.json).
-
-## Documentation and source
-
-[Usage guide](docs/getting-started.md)
-
-[Examples](examples) · [Schemas](schemas) · [Implementation and public interfaces](src) · [Verification cases](test) · [Contributing](CONTRIBUTING.md) · [Security reporting](SECURITY.md) · [License](LICENSE) · [Attribution notices](NOTICE)
+Code: [Apache-2.0](LICENSE). Retained prior grants: [LICENSE-PREVIOUS](LICENSE-PREVIOUS). [NOTICE](NOTICE) preserves attribution.
+[LICENSE-ASSETS](LICENSE-ASSETS) retains separate terms for covered brand/content assets; it does not change the code license or grant rights to third-party/site-owned content.

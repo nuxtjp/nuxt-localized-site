@@ -31,7 +31,7 @@ const localizedSiteModule: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOp
   meta: {
     name: '@nuxtjp/localized-site',
     configKey: 'nuxtJpLocalizedSite',
-    compatibility: { nuxt: '^4.5.0' }
+    compatibility: { nuxt: '^4.5.1' }
   },
   defaults: {},
   async setup(options, nuxt) {

@@ -7,14 +7,15 @@ concurrency:
   group: package-publication-${{ github.repository }}
   cancel-in-progress: false
 jobs:
-  publish:
+  prepare:
     if: vars.REGISTRY_PUBLISH_ENABLED == 'true' && github.event.repository.private == false
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    environment: npm-public
     permissions:
       contents: read
-      id-token: write
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+      archive-sha256: ${{ steps.binding.outputs.archive-sha256 }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -53,12 +54,58 @@ jobs:
             npm ci
           fi
           "$PACKAGE_MANAGER" test
+          "$PACKAGE_MANAGER" run typecheck
           "$PACKAGE_MANAGER" run --if-present build
+          "$PACKAGE_MANAGER" run validate:example
           mkdir -p "$RUNNER_TEMP/package-release"
           npm pack --json --pack-destination "$RUNNER_TEMP/package-release" > "$RUNNER_TEMP/package-pack.json"
           ARCHIVE=$(node -e 'const p=require(process.env.RUNNER_TEMP+"/package-pack.json");if(p.length!==1)throw Error("One archive required");process.stdout.write(p[0].filename)')
           python3 scripts/check-public-package.py npm --archive "$RUNNER_TEMP/package-release/$ARCHIVE"
-      - name: Publish the inspected archive through OIDC
+      - name: Verify the inspected archive in a separate host
         run: |
-          ARCHIVE=$(node -e 'const p=require(process.env.RUNNER_TEMP+"/package-pack.json");process.stdout.write(p[0].filename)')
-          npm publish "$RUNNER_TEMP/package-release/$ARCHIVE" --registry=https://registry.npmjs.org --access public --provenance --ignore-scripts
+          ARCHIVE=$(node -e 'process.stdout.write(require(process.env.RUNNER_TEMP+"/package-pack.json")[0].filename)')
+          node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/package-release/$ARCHIVE"
+      - name: Bind archive to the reviewed source
+        id: binding
+        run: node .github/scripts/release-archive.mjs prepare "$RUNNER_TEMP/package-release"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        id: upload
+        with:
+          name: npm-release-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/package-release/
+          if-no-files-found: error
+          retention-days: 7
+          overwrite: false
+  publish:
+    needs: prepare
+    if: vars.REGISTRY_PUBLISH_ENABLED == 'true' && github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm-public
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24.15.0'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/package-release
+      - name: Verify the prepared archive and publish without lifecycle
+        env:
+          EXPECTED_ARCHIVE_SHA256: ${{ needs.prepare.outputs.archive-sha256 }}
+          APPROVED_SHA: ${{ vars.REGISTRY_SECURITY_APPROVED_SHA }}
+          RELEASE_TAG_PREFIX: ${{ vars.REGISTRY_NPM_TAG_PREFIX || 'v' }}
+        run: |
+          test "$APPROVED_SHA" = "$GITHUB_SHA"
+          test "$GITHUB_REF_TYPE" = tag
+          test "$GITHUB_REF_NAME" = "${RELEASE_TAG_PREFIX}0.1.0"
+          node .github/scripts/release-archive.mjs verify "$RUNNER_TEMP/package-release"
+          npm publish "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.1.0.tgz" --registry=https://registry.npmjs.org --access public --provenance --ignore-scripts
