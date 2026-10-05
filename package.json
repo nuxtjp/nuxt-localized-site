@@ -19,7 +19,8 @@
     "README.md",
     "NOTICE",
     "LICENSE-ASSETS",
-    "LICENSE-PREVIOUS"
+    "LICENSE-PREVIOUS",
+    "README.ja.md"
   ],
   "bin": {
     "nuxtjp-localized-site": "./bin/nuxtjp-localized-site.mjs"
