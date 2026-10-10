@@ -43,3 +43,5 @@ jobs:
           path: ${{ runner.temp }}/*.tgz
           if-no-files-found: error
           retention-days: 7
+      - name: Verify backports in a fresh packed consumer
+        run: node .github/scripts/package-consumer-security.mjs "$RUNNER_TEMP/nuxtjp-localized-site-0.1.2.tgz" @nuxtjp/localized-site
