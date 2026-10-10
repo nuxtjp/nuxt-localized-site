@@ -3,7 +3,7 @@ from pathlib import Path
 
 expected_repo = 'nuxtjp/nuxt-localized-site'
 expected_name = '@nuxtjp/localized-site'
-expected_version = '0.1.2'
+expected_version = '0.1.3'
 mode = os.environ['RELEASE_MODE']
 sha = os.environ['GITHUB_SHA']
 assert mode in ('prepare', 'bootstrap', 'oidc')
