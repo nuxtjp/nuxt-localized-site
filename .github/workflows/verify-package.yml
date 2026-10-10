@@ -24,6 +24,8 @@ jobs:
         run: npm install --global pnpm@10.29.3
       - name: Install reviewed lockfile and backports
         run: pnpm install --frozen-lockfile
+      - name: Build validator and module before playground preparation
+        run: pnpm run build:validator && pnpm run build:module
       - name: Generate Nuxt playground types
         run: pnpm exec nuxt prepare playground
       - name: Test APIs and dependency regression cases

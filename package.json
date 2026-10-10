@@ -59,7 +59,7 @@
     "prepack": "pnpm test && pnpm typecheck && pnpm build && pnpm validate:example",
     "test:organization": "pnpm run build:validator && pnpm run build:module && node --test test/organization-check.mjs",
     "test:dependency-security": "node --test scripts/dependency-security.check.cjs",
-    "test:consumer-security": "node --test scripts/consumer-security.test.mjs"
+    "test:consumer-security": "node --test scripts/consumer-security.check.mjs"
   },
   "peerDependencies": {
     "nuxt": "^4.5.1",
