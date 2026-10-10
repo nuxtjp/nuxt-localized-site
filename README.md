@@ -64,3 +64,7 @@ pnpm pack
 
 Code: [Apache-2.0](LICENSE). [LICENSE-PREVIOUS](LICENSE-PREVIOUS) retains prior grants, and [NOTICE](NOTICE) preserves attribution.
 [LICENSE-ASSETS](LICENSE-ASSETS) retains separate terms for covered brand/content assets. It does not change the code license or grant rights to third-party or site-owned content.
+
+## Consumer dependency security
+
+See [dependency security backports](security/README.md) before installing this package in a Nuxt application. pnpm consumers must explicitly apply the included backports and verify their locked dependency tree; ordinary npm installation does not apply them.

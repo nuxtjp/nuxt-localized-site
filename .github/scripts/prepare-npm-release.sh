@@ -13,12 +13,14 @@ if test "$MANAGER" = pnpm@10.29.3; then
   pnpm run build:validator
   pnpm exec nuxt prepare playground
   pnpm pack --pack-destination "$RUNNER_TEMP/package-release"
-  node -e 'const fs=require("node:fs"),p=require("./package.json");fs.writeFileSync(process.env.RUNNER_TEMP+"/package-pack.json",JSON.stringify([{name:p.name,version:p.version,filename:"nuxtjp-localized-site-0.1.1.tgz"}]))'
+  node -e 'const fs=require("node:fs"),p=require("./package.json");fs.writeFileSync(process.env.RUNNER_TEMP+"/package-pack.json",JSON.stringify([{name:p.name,version:p.version,filename:"nuxtjp-localized-site-0.1.2.tgz"}]))'
 else
   test "$MANAGER" = npm@11.12.1
   npm ci --ignore-scripts
   npm pack --json --pack-destination "$RUNNER_TEMP/package-release" > "$RUNNER_TEMP/package-pack.json"
 fi
-python3 scripts/check-public-package.py npm --archive "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.1.1.tgz"
-node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.1.1.tgz"
+python3 scripts/check-public-package.py npm --archive "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.1.2.tgz"
+node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.1.2.tgz"
 :
+
+node .github/scripts/package-consumer-security.mjs "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.1.2.tgz" @nuxtjp/localized-site
