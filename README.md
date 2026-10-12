@@ -68,3 +68,7 @@ Code: [Apache-2.0](LICENSE). [LICENSE-PREVIOUS](LICENSE-PREVIOUS) retains prior 
 ## Consumer dependency security
 
 See [dependency security backports](security/README.md) before installing this package in a Nuxt application. pnpm consumers must explicitly apply the included backports and verify their locked dependency tree; ordinary npm installation does not apply them.
+
+## Public showcase / OSS紹介
+
+[Dashboard, product LP, public feed and owner operations](docs/public-showcase.md) — opt-in 0.2.0 candidate; staged owner approval is still required.

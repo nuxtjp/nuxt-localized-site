@@ -1,0 +1,52 @@
+{
+  "schema": "nuxtjp://showcase/v1",
+  "owner": "Example organization (synthetic)",
+  "observedAt": "2026-10-08T00:00:00Z",
+  "entries": [
+    {
+      "id": "parser",
+      "kind": "oss",
+      "name": {
+        "ja": "文書解析の例",
+        "en": "Document parser example"
+      },
+      "summary": {
+        "ja": "公開APIからの利用例。表示値は架空です。",
+        "en": "A public API example. All values are synthetic."
+      },
+      "repository": "https://github.com/example/parser",
+      "homepage": "https://example.com/parser",
+      "license": "Apache-2.0",
+      "metrics": [
+        {
+          "registry": "npm",
+          "package": "@example/parser",
+          "period": {
+            "start": "2026-10-01",
+            "end": "2026-10-07"
+          },
+          "observedAt": "2026-10-08T00:00:00Z",
+          "status": "available",
+          "downloads": 1234,
+          "source": "https://api.npmjs.org/downloads/point/2026-10-01:2026-10-07/@example/parser"
+        }
+      ]
+    },
+    {
+      "id": "workspace",
+      "kind": "product",
+      "name": {
+        "ja": "製品ワークスペース",
+        "en": "Product workspace"
+      },
+      "summary": {
+        "ja": "非公開ソースの製品紹介。公開リンクだけを共有します。",
+        "en": "A product with private source. Only public presentation data is shared."
+      },
+      "repository": null,
+      "homepage": "https://example.com/workspace",
+      "license": null,
+      "metrics": []
+    }
+  ]
+}

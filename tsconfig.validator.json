@@ -11,6 +11,7 @@
   },
   "include": [
     "src/contracts/**/*.ts",
-    "src/content/**/*.ts"
+    "src/content/**/*.ts",
+    "src/showcase/**/*.ts"
   ]
 }

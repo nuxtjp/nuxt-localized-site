@@ -43,5 +43,8 @@ jobs:
           path: ${{ runner.temp }}/*.tgz
           if-no-files-found: error
           retention-days: 7
+      - run: pnpm exec playwright install --with-deps chromium
       - name: Verify backports in a fresh packed consumer
-        run: node .github/scripts/package-consumer-security.mjs "$RUNNER_TEMP/nuxtjp-localized-site-0.1.4.tgz" @nuxtjp/localized-site
+        run: node .github/scripts/package-consumer-security.mjs "$RUNNER_TEMP/nuxtjp-localized-site-0.2.0.tgz" @nuxtjp/localized-site
+      - name: Exercise public showcase in an isolated archive consumer
+        run: node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/nuxtjp-localized-site-0.2.0.tgz"
