@@ -1,4 +1,4 @@
-import type { ShowcaseFeed } from './types.js'
+import type { DownloadMetric, ShowcaseFeed } from './types.js'
 const fail = (): never => { throw new Error('Invalid public showcase feed') }
 function record(value: unknown, keys: string[]): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return fail()
@@ -47,28 +47,34 @@ export function validateShowcaseFeed(input: unknown): ShowcaseFeed {
     if (!Array.isArray(entry.metrics) || entry.metrics.length > 20 ||
         (entry.kind === 'product' && entry.metrics.length)) fail()
     for (const candidate of entry.metrics as unknown[]) {
-      const metric = record(candidate, ['registry', 'package', 'period', 'observedAt', 'status', 'downloads', 'source'])
-      if (metric.registry !== 'npm' && metric.registry !== 'crates.io') fail()
-      text(metric.package, 214)
-      if (!(metric.registry === 'npm' ? /^(?:@[a-z0-9_-]+\/)?[a-z0-9_-]+$/ : /^[a-z0-9_-]+$/).test(metric.package)) fail()
-      const period = record(metric.period, ['start', 'end'])
-      day(period.start); day(period.end)
-      if ((period.start as string) > (period.end as string)) fail()
-      timestamp(metric.observedAt)
-      if (Date.parse(metric.observedAt as string) > Date.parse(feed.observedAt as string)) fail()
-      url(metric.source, metric.registry === 'npm' ? ['api.npmjs.org'] : ['crates.io'])
-      const sourcePath = decodeURIComponent(new URL(metric.source as string).pathname)
-      const expectedPath = metric.registry === 'npm'
-        ? `/downloads/point/${period.start}:${period.end}/${metric.package}`
-        : `/api/v1/crates/${metric.package}/downloads`
-      if (sourcePath !== expectedPath || (period.end as string) > (metric.observedAt as string).slice(0, 10)) fail()
-      if (metric.status === 'available') {
-        if (!Number.isSafeInteger(metric.downloads) || (metric.downloads as number) < 0) fail()
-      } else if (metric.status !== 'unavailable' || metric.downloads !== null) fail()
+      const metric = validateDownloadMetric(candidate)
+      if (Date.parse(metric.observedAt) > Date.parse(feed.observedAt as string)) fail()
+      const period = metric.period
       const key = `${metric.registry}:${metric.package}:${period.start}:${period.end}`
       if (packages.has(key)) fail()
       packages.add(key)
     }
   }
   return structuredClone(input) as ShowcaseFeed
+}
+
+export function validateDownloadMetric(input: unknown): DownloadMetric {
+  const metric = record(input, ['registry', 'package', 'period', 'observedAt', 'status', 'downloads', 'source'])
+  if (metric.registry !== 'npm' && metric.registry !== 'crates.io') fail()
+  text(metric.package, 214)
+  if (!(metric.registry === 'npm' ? /^(?:@[a-z0-9_-]+\/)?[a-z0-9_-]+$/ : /^[a-z0-9_-]+$/).test(metric.package)) fail()
+  const period = record(metric.period, ['start', 'end'])
+  day(period.start); day(period.end)
+  if ((period.start as string) > (period.end as string)) fail()
+  timestamp(metric.observedAt)
+  url(metric.source, metric.registry === 'npm' ? ['api.npmjs.org'] : ['crates.io'])
+  const sourcePath = decodeURIComponent(new URL(metric.source as string).pathname)
+  const expectedPath = metric.registry === 'npm'
+    ? `/downloads/point/${period.start}:${period.end}/${metric.package}`
+    : `/api/v1/crates/${metric.package}/downloads`
+  if (sourcePath !== expectedPath || (period.end as string) > (metric.observedAt as string).slice(0, 10)) fail()
+  if (metric.status === 'available') {
+    if (!Number.isSafeInteger(metric.downloads) || (metric.downloads as number) < 0) fail()
+  } else if (metric.status !== 'unavailable' || metric.downloads !== null) fail()
+  return structuredClone(input) as DownloadMetric
 }

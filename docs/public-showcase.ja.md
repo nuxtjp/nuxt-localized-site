@@ -25,3 +25,11 @@ registry/package/開始終了日/観測時刻/出典/statusを持つ統計を使
 ## 公開・配備前の確認
 
 0.2.0候補は既存のstage公開workflowを維持します。source SHAと`REGISTRY_SECURITY_APPROVED_SHA`、versionとtagの一致が必要です。source/archive確認後にOIDC stageへ進め、npm ownerが該当stageを2FA承認します。CI候補を公開済みとは扱いません。Trusted Publisherのworkflow/environmentを変えず、正式archive確認の後にsite依存更新と既存content/host承認を経て配備します。
+
+## 上限付き公開registry統計取得
+
+`./showcase/collectors` の `collectDownloads(registry, packageName, { start, end }, { now: Date.now() })` でnpmまたはcrates.ioの一つの公開endpointを読みます。管理対象Crowsi transport 0.11.2のHTTPS origin束縛・redirect拒否・128 KiB上限・15秒deadlineを再利用し、同等処理を複製しません。匿名の公開統計なのでcredential/account grantは不要です。純粋UIはcollectorを実行しません。
+
+観測日前に終了した1–31日間のUTC日を指定します。npmのpackage/開始終了日を照合し、crates.ioはversion別とextra日別数を合計して重複・欠落日を拒否します。不正応答・denial・上限超過・timeoutは未取得/nullであり0件ではありません。入力不正は通信前に拒否します。自動retry/paging/pollingはありません。owner workflowがallowlist・request budget/rate・schedule・前feedを管理し、testではfake fetchを注入します。
+
+[crates.io API型の正本](https://github.com/rust-lang/crates.io/blob/main/crates/crates_io_api_types/src/lib.rs)を参照し、実cloud accountの受入とは分けます。

@@ -2,7 +2,7 @@
 
 [日本語](public-showcase.ja.md)
 
-`@nuxtjp/localized-site/showcase` owns the feed types, runtime validator and download summaries. `NuxtJpOssShowcase` renders a validated feed with slots and CSS variables. The same data can be linked at its owner site or rendered with a consumer's theme. It introduces no cross-organization runtime dependency, authentication or live network request.
+`@nuxtjp/localized-site/showcase` owns the feed types, runtime validator and download summaries. `NuxtJpOssShowcase` renders a validated feed with slots and CSS variables. The same data can be linked at its owner site or rendered with a consumer's theme. Rendering and validation introduce no authentication or live request. Collection is an explicit opt-in build operation.
 
 ```ts
 import { validateShowcaseFeed, summarizeDownloads } from '@nuxtjp/localized-site/showcase'
@@ -32,3 +32,15 @@ Data acquisition belongs in each owner's reviewed build/collection workflow. Use
 ## Release and deployment gates
 
 The 0.2.0 candidate retains the existing staged-publication workflow. The reviewed source SHA must match `REGISTRY_SECURITY_APPROVED_SHA`, and the release tag must match the package version. The source/archive approval precedes OIDC staging; the npm owner then approves the exact staged package with 2FA. A CI archive is not a published release. Keep the Trusted Publisher workflow/environment binding unchanged. Switching site consumers to 0.2.0 and production deployment follows official archive verification and each site's existing content/host approvals.
+
+## Bounded public-registry collection
+
+```ts
+import { collectDownloads } from '@nuxtjp/localized-site/showcase/collectors'
+const metric = await collectDownloads('npm', '@zixcel/document-structure',
+  { start: '2026-10-01', end: '2026-10-07' }, { now: Date.now() })
+```
+
+Use the same call with `crates.io` and a crate name. Each call reads one public endpoint through the managed Crowsi transport (0.11.2), with exact HTTPS origins, manual-redirect refusal, 128 KiB response limit and a 15-second deadline. This equivalent managed implementation avoids duplicating transport limits. It requires no account approval grant or credential: anonymous registry statistics are separate from authenticated provider operations. The pure component does not call the collector.
+
+Supply 1–31 complete UTC days ending before the observation day. npm package/start/end must match the requested identity and dates. crates.io combines dated version downloads with `meta.extra_downloads`, rejects duplicate rows and requires explicit coverage for every requested day. Malformed, denied, oversized, incomplete or timed-out responses return unavailable/null; unsafe inputs fail before transport. There is no automatic retry, paging or continuous poll. The owner job controls package allowlists, request budget/rate, schedule and last verified feed. Test doubles replace fetch; no real cloud account is accessed. Source API: [crates.io API types](https://github.com/rust-lang/crates.io/blob/main/crates/crates_io_api_types/src/lib.rs).
