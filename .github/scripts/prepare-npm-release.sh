@@ -9,9 +9,14 @@ mkdir -p "$RUNNER_TEMP/package-release"
 MANAGER=$(node -p 'require("./package.json").packageManager')
 if test "$MANAGER" = pnpm@10.29.3; then
   npm install --global pnpm@10.29.3
-  pnpm install --frozen-lockfile
+  pnpm install --frozen-lockfile --ignore-scripts
   pnpm run build:validator
+  pnpm run build:module
   pnpm exec nuxt prepare playground
+  pnpm test
+  pnpm typecheck
+  pnpm build
+  pnpm validate:example
   npm pack --ignore-scripts --json --pack-destination "$RUNNER_TEMP/package-release" > "$RUNNER_TEMP/package-pack.json"
 else
   test "$MANAGER" = npm@12.2.0
