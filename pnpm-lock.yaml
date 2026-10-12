@@ -25,6 +25,9 @@ importers:
 
   .:
     dependencies:
+      '@crowsi/provider-http-transport':
+        specifier: 0.11.2
+        version: 0.11.2
       '@nuxt/kit':
         specifier: 4.5.2
         version: 4.5.2(magic-string@1.4.3)(magicast@0.5.5)(rolldown@1.2.13)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.13)(rollup@4.64.2)(vite@8.3.3(@types/node@24.12.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)))
@@ -226,6 +229,10 @@ packages:
 
   '@colordx/core@5.8.0':
     resolution: {integrity: sha512-cG0QJAO6VkaRUlIb0zOzX9gfJgs1pjoOL9gZ/PK1kfvBs0GCkADu5oQh6gPxXgQnZ3gV575h+lQRC0NlMDTclA==}
+
+  '@crowsi/provider-http-transport@0.11.2':
+    resolution: {integrity: sha512-FzmApo6R+5qeisjEfyBF4jNO7O3BF01Gb2JZk/613ze1USW+9fjMDo0jqvtdJtdvb66+9JVEa6eEJegXkRnfLA==}
+    engines: {node: '>=22'}
 
   '@dxup/nuxt@0.5.10':
     resolution: {integrity: sha512-54Vehb7LmR7qYpC6KFwjDTSm6CB1CayBu+JXdHrPLrIjjr5xAgb43jvgOU+mnB+tsRh414fSsEy0QjBMKILQ8g==}
@@ -3897,6 +3904,8 @@ snapshots:
   '@cloudflare/kv-asset-handler@0.4.2': {}
 
   '@colordx/core@5.8.0': {}
+
+  '@crowsi/provider-http-transport@0.11.2': {}
 
   '@dxup/nuxt@0.5.10(esbuild@0.28.2)(magicast@0.5.5)(rolldown@1.2.13)(rollup@4.64.2)(vite@8.3.3(@types/node@24.12.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2))':
     dependencies:

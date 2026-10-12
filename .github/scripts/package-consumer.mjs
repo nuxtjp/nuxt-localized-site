@@ -29,8 +29,12 @@ import { readFileSync } from 'node:fs'
 import { localePath, siteRoutes, maintenanceForService } from '@nuxtjp/localized-site/core'
 import { validateSiteConfig } from '@nuxtjp/localized-site/validator'
 import { validateShowcaseFeed, summarizeDownloads } from '@nuxtjp/localized-site/showcase'
+import { collectDownloads } from '@nuxtjp/localized-site/showcase/collectors'
 const showcase = validateShowcaseFeed(JSON.parse(readFileSync('app/data/showcase.json', 'utf8')))
 assert.equal(summarizeDownloads(showcase, Date.parse(showcase.observedAt))[0].downloads, 1234)
+const period = { start: '2026-10-01', end: '2026-10-02' }
+const metric = await collectDownloads('npm', '@example/parser', period, { now: Date.parse('2026-10-03T00:00:00Z'), fetchImplementation: async () => new Response(JSON.stringify({ package: '@example/parser', ...period, downloads: 42 })) })
+assert.equal(metric.downloads, 42)
 const config = validateSiteConfig(JSON.parse(readFileSync('site.config.json', 'utf8')))
 assert.equal(siteRoutes(config).length, 8)
 assert.equal(localePath('/docs?q=sample#main-content', 'en', config), '/en/docs?q=sample#main-content')
