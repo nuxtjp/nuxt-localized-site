@@ -58,6 +58,7 @@ const localizedSiteModule: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOp
         './runtime/app/components/PublicMaintenanceNotice.vue'
       )
     })
+    addComponent({ name: 'NuxtJpOssShowcase', filePath: resolver.resolve('./runtime/app/components/OssShowcase.vue') })
     addPlugin(resolver.resolve('./runtime/app/plugins/localized-head'))
     addImports([
       {

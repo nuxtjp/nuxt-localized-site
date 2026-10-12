@@ -64,3 +64,7 @@ pnpm pack
 
 コードは[Apache-2.0](LICENSE)です。[LICENSE-PREVIOUS](LICENSE-PREVIOUS)に以前の許諾、[NOTICE](NOTICE)に帰属表示を保持します。
 [LICENSE-ASSETS](LICENSE-ASSETS)は対象となるブランド・コンテンツ素材の別条件を保持します。コードのライセンスを変更せず、第三者やサイト所有者のコンテンツの権利を追加で許諾するものでもありません。
+
+## Public showcase / OSS紹介
+
+[Dashboard, product LP, public feed and owner operations](docs/public-showcase.ja.md) — opt-in 0.2.0 candidate; staged owner approval is still required.

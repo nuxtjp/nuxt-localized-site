@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { execFileSync } from 'node:child_process'
 const [mode, directory] = process.argv.slice(2)
 const sha = process.env.GITHUB_SHA
-const name = '@nuxtjp/localized-site', version = '0.1.4', filename = 'nuxtjp-localized-site-0.1.4.tgz'
+const name = '@nuxtjp/localized-site', version = '0.2.0', filename = 'nuxtjp-localized-site-0.2.0.tgz'
 if (!lstatSync(join(directory, filename)).isFile()) throw Error('Regular archive required')
 if (!/^[a-f0-9]{40}$/.test(sha ?? '') || process.env.GITHUB_REPOSITORY !== 'nuxtjp/nuxt-localized-site')
   throw Error('Exact approved public source required')
@@ -16,7 +16,8 @@ const inspect = () => {
   execFileSync('python3', ['scripts/check-public-package.py', 'npm', '--archive', join(directory, filename)], { stdio: 'inherit' })
 }
 if (mode === 'prepare') {
-  const pack = JSON.parse(readFileSync(join(process.env.RUNNER_TEMP, 'package-pack.json')))
+  const packed = JSON.parse(readFileSync(join(process.env.RUNNER_TEMP, 'package-pack.json')))
+  const pack = Array.isArray(packed) ? packed : Object.values(packed)
   if (pack.length !== 1 || pack[0].name !== name || pack[0].version !== version || pack[0].filename !== filename)
     throw Error('Unexpected pack identity')
   inspect()

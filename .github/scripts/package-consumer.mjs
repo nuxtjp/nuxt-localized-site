@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdtempSync, writeFileSync, readFileSync, copyFileSync } from 'node:fs'
+import { mkdtempSync, writeFileSync, readFileSync, copyFileSync, cpSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { spawnSync, spawn } from 'node:child_process'
@@ -28,11 +28,17 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { localePath, siteRoutes, maintenanceForService } from '@nuxtjp/localized-site/core'
 import { validateSiteConfig } from '@nuxtjp/localized-site/validator'
+import { validateShowcaseFeed, summarizeDownloads } from '@nuxtjp/localized-site/showcase'
+const showcase = validateShowcaseFeed(JSON.parse(readFileSync('app/data/showcase.json', 'utf8')))
+assert.equal(summarizeDownloads(showcase, Date.parse(showcase.observedAt))[0].downloads, 1234)
 const config = validateSiteConfig(JSON.parse(readFileSync('site.config.json', 'utf8')))
 assert.equal(siteRoutes(config).length, 8)
 assert.equal(localePath('/docs?q=sample#main-content', 'en', config), '/en/docs?q=sample#main-content')
 assert.equal(maintenanceForService({}, 'sample-service'), null)
 `)
+cpSync(new URL('../../playground/pages', import.meta.url), join(root, 'app/pages'), { recursive: true })
+cpSync(new URL('../../playground/data', import.meta.url), join(root, 'app/data'), { recursive: true })
+writeFileSync(join(root, 'app/app.vue'), '<template><NuxtLayout><NuxtPage /></NuxtLayout></template>')
 run('node', ['smoke.mjs'])
 run('node', ['node_modules/@nuxtjp/localized-site/bin/nuxtjp-localized-site.mjs', 'validate', '--content-root', '.'])
 run('node', ['node_modules/nuxt/bin/nuxt.mjs', 'prepare'])
@@ -68,6 +74,7 @@ try {
   for (const [name, item] of Object.entries(lock.packages)) {
     if (name && name !== 'node_modules/@nuxtjp/localized-site' && item.resolved) assert.ok(item.resolved.startsWith('https://registry.npmjs.org/'))
   }
+  run('node', [new URL('./showcase-browser.mjs', import.meta.url).pathname, base])
   if (process.argv[3]) run('node', [resolve(process.argv[3]), root, base])
   console.log(JSON.stringify({ root, result: 'pass', actual_archive: archive, public_dependencies: true, routes_SSR: 8, unset_links: true, CLI: true, core_validator_import: true, typecheck: true, build: true }))
 } finally { server.kill('SIGTERM') }
