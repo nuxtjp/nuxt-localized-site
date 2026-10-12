@@ -1,9 +1,9 @@
 import json, os, re, subprocess, tomllib, urllib.error, urllib.parse, urllib.request
 from pathlib import Path
 
-expected_repo = 'nuxtjp/nuxt-localized-site'
+expected_repo = 'nuxtjp/site-builder'
 expected_name = '@nuxtjp/localized-site'
-expected_version = '0.2.0'
+expected_version = '0.2.1'
 mode = os.environ['RELEASE_MODE']
 sha = os.environ['GITHUB_SHA']
 assert mode in ('prepare', 'bootstrap', 'oidc')

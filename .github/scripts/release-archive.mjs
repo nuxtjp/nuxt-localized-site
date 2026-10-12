@@ -4,14 +4,14 @@ import { join } from 'node:path'
 import { execFileSync } from 'node:child_process'
 const [mode, directory] = process.argv.slice(2)
 const sha = process.env.GITHUB_SHA
-const name = '@nuxtjp/localized-site', version = '0.2.0', filename = 'nuxtjp-localized-site-0.2.0.tgz'
+const name = '@nuxtjp/localized-site', version = '0.2.1', filename = 'nuxtjp-localized-site-0.2.1.tgz'
 if (!lstatSync(join(directory, filename)).isFile()) throw Error('Regular archive required')
-if (!/^[a-f0-9]{40}$/.test(sha ?? '') || process.env.GITHUB_REPOSITORY !== 'nuxtjp/nuxt-localized-site')
+if (!/^[a-f0-9]{40}$/.test(sha ?? '') || process.env.GITHUB_REPOSITORY !== 'nuxtjp/site-builder')
   throw Error('Exact approved public source required')
 const hashArchive = () => createHash('sha256').update(readFileSync(join(directory, filename))).digest('hex')
 const inspect = () => {
   const manifest = JSON.parse(execFileSync('tar', ['-xOf', join(directory, filename), 'package/package.json']))
-  if (manifest.name !== name || manifest.version !== version || manifest.private === true)
+  if (manifest.name !== name || manifest.version !== version || manifest.private === true || manifest.repository?.url !== "git+https://github.com/nuxtjp/site-builder.git")
     throw Error('Archive identity mismatch')
   execFileSync('python3', ['scripts/check-public-package.py', 'npm', '--archive', join(directory, filename)], { stdio: 'inherit' })
 }
@@ -22,6 +22,8 @@ if (mode === 'prepare') {
     throw Error('Unexpected pack identity')
   inspect()
   const sha256 = hashArchive()
+  if (!/^[a-f0-9]{64}$/.test(process.env.OWNER_REVIEWED_ARCHIVE_SHA256 ?? '') ||
+      sha256 !== process.env.OWNER_REVIEWED_ARCHIVE_SHA256) throw Error('Owner-reviewed archive digest mismatch')
   writeFileSync(join(directory, 'release.json'), JSON.stringify({ source: sha, name, version, filename, sha256 }) + '\n')
   writeFileSync(process.env.GITHUB_OUTPUT, `archive-sha256=${sha256}\n`, { flag: 'a' })
 } else if (mode === 'verify') {
