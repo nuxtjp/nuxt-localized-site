@@ -60,7 +60,7 @@ pnpm pack
 
 ## 文書とライセンス
 
-[使い方](https://github.com/nuxtjp/nuxt-localized-site/blob/main/docs/getting-started.md) · [Schema](schemas/localized-site-v1.schema.json) · [テスト](https://github.com/nuxtjp/nuxt-localized-site/tree/main/test) · [セキュリティ報告](https://github.com/nuxtjp/nuxt-localized-site/blob/main/SECURITY.md)
+[使い方](https://github.com/nuxtjp/site-builder/blob/main/docs/getting-started.md) · [Schema](schemas/localized-site-v1.schema.json) · [テスト](https://github.com/nuxtjp/site-builder/tree/main/test) · [セキュリティ報告](https://github.com/nuxtjp/site-builder/blob/main/SECURITY.md)
 
 コードは[Apache-2.0](LICENSE)です。[LICENSE-PREVIOUS](LICENSE-PREVIOUS)に以前の許諾、[NOTICE](NOTICE)に帰属表示を保持します。
 [LICENSE-ASSETS](LICENSE-ASSETS)は対象となるブランド・コンテンツ素材の別条件を保持します。コードのライセンスを変更せず、第三者やサイト所有者のコンテンツの権利を追加で許諾するものでもありません。

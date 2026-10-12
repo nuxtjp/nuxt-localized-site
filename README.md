@@ -60,7 +60,7 @@ pnpm pack
 
 ## Documentation and license
 
-[Usage guide](https://github.com/nuxtjp/nuxt-localized-site/blob/main/docs/getting-started.md) · [Schema](schemas/localized-site-v1.schema.json) · [Tests](https://github.com/nuxtjp/nuxt-localized-site/tree/main/test) · [Security reporting](https://github.com/nuxtjp/nuxt-localized-site/blob/main/SECURITY.md)
+[Usage guide](https://github.com/nuxtjp/site-builder/blob/main/docs/getting-started.md) · [Schema](schemas/localized-site-v1.schema.json) · [Tests](https://github.com/nuxtjp/site-builder/tree/main/test) · [Security reporting](https://github.com/nuxtjp/site-builder/blob/main/SECURITY.md)
 
 Code: [Apache-2.0](LICENSE). [LICENSE-PREVIOUS](LICENSE-PREVIOUS) retains prior grants, and [NOTICE](NOTICE) preserves attribution.
 [LICENSE-ASSETS](LICENSE-ASSETS) retains separate terms for covered brand/content assets. It does not change the code license or grant rights to third-party or site-owned content.
