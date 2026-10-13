@@ -1,5 +1,5 @@
 import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import assert from 'node:assert/strict'
 
@@ -43,7 +43,7 @@ export function organizationSite(configUrl, key = process.env.SITE_ID) {
     devtools: { enabled: false },
     buildDir: join(root, '.nuxt', key),
     dir: { public: join(contentRoot, 'public') },
-    modules: [['@nuxtjp/localized-site', { contentRoot }]],
+    modules: [['@nuxtjp/localized-site', { contentRoot, maintenance: existsSync(join(contentRoot, 'public/maintenance.json')) }]],
     nitro: {
       output: { dir: join(root, '.output', key) },
       prerender: { failOnError: true }
@@ -74,4 +74,20 @@ export function checkSitePublication(root, key) {
     return checkPublicCatalog(JSON.parse(readFileSync(policy, 'utf8')), JSON.parse(readFileSync(catalog, 'utf8')))
   }
   return null
+}
+
+// Only a reviewed public snapshot is embedded; no browser registry/account requests.
+export async function loadOrganizationShowcase(contentRoot, snapshotName = 'showcase.json') {
+  if (!['showcase.json', 'organizations.json'].includes(snapshotName)) throw new Error('Unknown public snapshot name')
+  const root = directory(contentRoot)
+  const file = join(root, 'public', 'oss', snapshotName)
+  if (!existsSync(file)) return null
+  directory(join(root, 'public'))
+  directory(join(root, 'public', 'oss'))
+  if (lstatSync(file).isSymbolicLink() || !lstatSync(file).isFile() ||
+      !realpathSync(file).startsWith(root + sep) || lstatSync(file).size > 262144) {
+    throw new Error('Showcase must be a bounded regular public snapshot')
+  }
+  const { validateShowcaseFeed } = await import('../validator/showcase/index.js')
+  return validateShowcaseFeed(JSON.parse(readFileSync(file, 'utf8')))
 }

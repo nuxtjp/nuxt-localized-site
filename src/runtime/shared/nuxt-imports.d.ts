@@ -4,7 +4,7 @@ declare module '#imports' {
     '../app/composables/useLocalizedSite'
   ).useLocalizedSite
   export function useHead(
-    input: () => import('../core/seo').LocalizedHead
+    input: () => Partial<import('../core/seo').LocalizedHead>
   ): void
   export function useRoute(): {
     path: string
@@ -13,6 +13,9 @@ declare module '#imports' {
   export function useRuntimeConfig(): {
     public: {
       nuxtJpLocalizedSite: import('../../contracts/types').ResolvedSiteConfig
+      nuxtJpMaintenanceEnabled?: boolean
+      nuxtJpOssShowcase?: string
+      nuxtJpOrganizationShowcase?: string
     }
   }
 }

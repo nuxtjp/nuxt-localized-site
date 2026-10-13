@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useLocalizedSite } from '#imports'
+import { useLocalizedSite, useRuntimeConfig } from '#imports'
+const hasShowcase = Boolean(useRuntimeConfig().public.nuxtJpOssShowcase)
 
 const site = useLocalizedSite()
 </script>
@@ -16,6 +17,9 @@ const site = useLocalizedSite()
         </NuxtLink>
         <NuxtLink :to="site.localePath(site.locale.value, '/docs')">
           {{ site.content.value.docs.overview.title }}
+        </NuxtLink>
+        <NuxtLink v-if="hasShowcase" :to="site.localePath(site.locale.value, '/oss')">
+          {{ site.locale.value === 'ja' ? 'OSS・モジュール' : 'OSS & modules' }}
         </NuxtLink>
       </nav>
       <NuxtJpLocalizedLanguageSwitcher />

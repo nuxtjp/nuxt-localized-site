@@ -17,15 +17,15 @@ if test "$MANAGER" = pnpm@10.29.3; then
   pnpm typecheck
   pnpm build
   pnpm validate:example
-  npm pack --ignore-scripts --json --pack-destination "$RUNNER_TEMP/package-release" > "$RUNNER_TEMP/package-pack.json"
+  npm_config_ignore_scripts=true pnpm pack --json --pack-destination "$RUNNER_TEMP/package-release" > "$RUNNER_TEMP/package-pack.json"
 else
   test "$MANAGER" = npm@12.2.0
   npm ci --ignore-scripts
   npm pack --json --pack-destination "$RUNNER_TEMP/package-release" > "$RUNNER_TEMP/package-pack.json"
 fi
-python3 scripts/check-public-package.py npm --archive "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.2.1.tgz"
+python3 scripts/check-public-package.py npm --archive "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.2.2.tgz"
 pnpm exec playwright install --with-deps chromium
-node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.2.1.tgz"
+node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.2.2.tgz"
 :
 
-node .github/scripts/package-consumer-security.mjs "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.2.1.tgz" @nuxtjp/localized-site
+node .github/scripts/package-consumer-security.mjs "$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.2.2.tgz" @nuxtjp/localized-site

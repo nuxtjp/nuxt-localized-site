@@ -62,3 +62,24 @@ test('content-only catalog never accepts duplicated origins or site identities',
     await assert.rejects(runOrganizationCli(['check'], root), /Duplicate/)
   } finally { rmSync(root, { recursive: true, force: true }) }
 })
+
+test('public showcase is opt-in, validated and cannot follow symbolic links', async () => {
+  const { loadOrganizationShowcase } = await import('../organization/index.mjs')
+  const root = mkdtempSync(join(tmpdir(), 'nuxtjp-public-showcase-'))
+  try {
+    assert.equal(await loadOrganizationShowcase(root), null)
+    const folder = join(root, 'public/oss')
+    mkdirSync(folder, { recursive: true })
+    const file = join(folder, 'showcase.json')
+    const feed = JSON.parse(readFileSync(new URL('../playground/data/showcase.json', import.meta.url)))
+    writeFileSync(file, JSON.stringify(feed))
+    assert.deepEqual(await loadOrganizationShowcase(root), feed)
+    feed.entries[1].repository = 'https://github.com/example/private-product'
+    writeFileSync(file, JSON.stringify(feed))
+    await assert.rejects(loadOrganizationShowcase(root))
+    rmSync(file)
+    symlinkSync(join(root, 'secret.json'), file)
+    writeFileSync(join(root, 'secret.json'), '{}')
+    await assert.rejects(loadOrganizationShowcase(root))
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})

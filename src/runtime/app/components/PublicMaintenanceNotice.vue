@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRuntimeConfig } from '#imports'
+const enabled = useRuntimeConfig().public.nuxtJpMaintenanceEnabled
 import type { MaintenanceMessage } from '../../core/maintenance'
 import { maintenanceForService } from '../../core/maintenance'
 import { useLocalizedSite } from '../composables/useLocalizedSite'
@@ -8,6 +10,7 @@ const site = useLocalizedSite()
 const notice = ref<MaintenanceMessage | null>(null)
 
 onMounted(async () => {
+  if (enabled === false) return
   try {
     const response = await fetch('/maintenance.json', {
       credentials: 'same-origin',

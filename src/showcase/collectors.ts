@@ -47,7 +47,7 @@ export async function collectDownloads(registry: DownloadMetric['registry'], pac
     ...(options.fetchImplementation ? { fetchImplementation: options.fetchImplementation } : {}) })
   try {
     const response = await transport.request({ url: source, method: 'GET',
-      headers: { Accept: 'application/json', 'User-Agent': 'NuxtJP-public-showcase/0.2.0 (https://github.com/nuxtjp/nuxt-localized-site)' } })
+      headers: { Accept: 'application/json', 'User-Agent': 'NuxtJP-public-showcase/0.2.0 (https://github.com/nuxtjp/site-builder)' } })
     if (response.status !== 200) return metric
     const data = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(response.body)) as Record<string, unknown>
     const downloads = registry === 'npm'
