@@ -1,0 +1,333 @@
+{
+  "repository": "nuxtjp/site-builder",
+  "purpose": "Build Japanese/English product and organization sites from validated declarative content.",
+  "responsibility_boundary": "Organizations own claims, links, release/download data attribution and deployment. A site preview or source merge is not production acceptance.",
+  "packages": [
+    {
+      "manifest": "package.json",
+      "package": "@nuxtjp/localized-site",
+      "ecosystem": "npm",
+      "description": "Contract-first Japanese and English public-site module for Nuxt",
+      "interfaces": {
+        "exports": {
+          ".": {
+            "types": "./dist/types.d.mts",
+            "import": "./dist/module.mjs"
+          },
+          "./core": {
+            "types": "./dist/runtime/core/index.d.ts",
+            "import": "./dist/runtime/core/index.js"
+          },
+          "./validator": {
+            "types": "./validator/content/index.d.ts",
+            "import": "./validator/content/index.js"
+          },
+          "./schema": "./schemas/localized-site-v1.schema.json",
+          "./organization": {
+            "types": "./organization/index.d.mts",
+            "import": "./organization/index.mjs"
+          },
+          "./showcase": {
+            "types": "./validator/showcase/index.d.ts",
+            "import": "./validator/showcase/index.js"
+          },
+          "./showcase/collectors": {
+            "types": "./validator/showcase/collectors.d.ts",
+            "import": "./validator/showcase/collectors.js"
+          }
+        },
+        "bin": {
+          "nuxtjp-localized-site": "./bin/nuxtjp-localized-site.mjs"
+        },
+        "main": "./dist/module.mjs",
+        "types": "./dist/types.d.mts"
+      },
+      "declared_commands": {
+        "build:module": "nuxt-module-build build",
+        "build:validator": "tsc -p tsconfig.validator.json",
+        "build": "pnpm run build:validator && pnpm run build:module && nuxt build playground",
+        "typecheck": "vue-tsc --noEmit --project tsconfig.json",
+        "test": "vitest run && pnpm run test:organization && pnpm run test:dependency-security && pnpm run test:consumer-security",
+        "validate:example": "node ./bin/nuxtjp-localized-site.mjs validate --content-root ./examples/content",
+        "prepack": "pnpm test && pnpm typecheck && pnpm build && pnpm validate:example",
+        "test:organization": "pnpm run build:validator && pnpm run build:module && node --test test/organization-check.mjs",
+        "test:dependency-security": "node --test scripts/dependency-security.check.cjs",
+        "test:consumer-security": "node --test scripts/consumer-security.check.mjs"
+      }
+    }
+  ],
+  "schema_definitions": [
+    "schemas/localized-site-v1.schema.json",
+    "schemas/public-maintenance-state-v1.schema.json"
+  ],
+  "test_sources": [
+    "organization/workspace.mjs",
+    "scripts/check-public-package.py",
+    "scripts/consumer-security.check.mjs",
+    "security/project.mjs",
+    "src/runtime/core/path.ts",
+    "src/runtime/core/seo.ts",
+    "test/cli.test.ts",
+    "test/contract.test.ts",
+    "test/fixture.ts",
+    "test/maintenance.test.ts",
+    "test/messages.test.ts",
+    "test/organization-check.mjs",
+    "test/path.test.ts",
+    "test/seo.test.ts",
+    "test/showcase-collectors.test.ts",
+    "test/showcase.test.ts"
+  ],
+  "example_sources": [
+    "examples/content/site.config.json",
+    "playground/app.vue",
+    "playground/data/showcase.json",
+    "playground/nuxt.config.ts",
+    "playground/pages/oss/[id].vue",
+    "playground/pages/oss/index.vue"
+  ],
+  "workflow_definitions": [
+    {
+      "path": ".github/workflows/oss-policy.yml",
+      "jobs": [
+        {
+          "job": "repository-policy",
+          "condition": null,
+          "runs_on": "ubuntu-latest",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": "Verify repository policy",
+              "run": "python3 .github/oss-policy-check.py",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Verify policy regression tests",
+              "run": "cd .github && python3 -m unittest discover -s policy-tests",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Reject retired publication modes",
+              "run": "python3 .github/scripts/test-release-gate.py",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Check policy types",
+              "run": "python3 -m venv \"$RUNNER_TEMP/policy-types\"\n\"$RUNNER_TEMP/policy-types/bin/pip\" install -r .github/policy/requirements.txt\n\"$RUNNER_TEMP/policy-types/bin/mypy\" --strict .github/policy .github/oss-policy-check.py .github/policy-tests\n",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/publish-npm.yml",
+      "jobs": [
+        {
+          "job": "prepare",
+          "condition": null,
+          "runs_on": "ubuntu-latest",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": "Require approved public source and release tag",
+              "run": "python3 .github/scripts/release-gate.py",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "condition": null
+            },
+            {
+              "name": "Install pinned managers, build and inspect without credentials",
+              "run": "bash .github/scripts/prepare-npm-release.sh",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Bind archive to reviewed source",
+              "run": "node .github/scripts/release-archive.mjs prepare \"$RUNNER_TEMP/package-release\"",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "condition": null
+            }
+          ]
+        },
+        {
+          "job": "publish",
+          "condition": "inputs.mode != 'prepare' && vars.REGISTRY_PUBLISH_ENABLED == 'true'",
+          "runs_on": "ubuntu-latest",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": "Recheck source, gates and registry state",
+              "run": "python3 .github/scripts/release-gate.py",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": "npm install --global npm@12.2.0",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "condition": null
+            },
+            {
+              "name": "Verify prepared archive before authentication",
+              "run": "node .github/scripts/release-archive.mjs verify \"$RUNNER_TEMP/package-release\"",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Subsequent staging with repository OIDC identity",
+              "run": "set -o pipefail\nnpm stage publish \"$RUNNER_TEMP/package-release/nuxtjp-localized-site-0.2.2.tgz\" --registry=https://registry.npmjs.org --access public --provenance --ignore-scripts | tee \"$RUNNER_TEMP/npm-stage-result.txt\"\n",
+              "uses": null,
+              "condition": "inputs.mode == 'oidc'"
+            },
+            {
+              "name": "Record pending stage and reviewed distribution for owner approval",
+              "run": "{\n  printf '%s\\n' 'Staged only; not published. Owner: npmjs.com Staged Packages -> exact entry -> Approve with 2FA.' '```text'\n  cat \"$RUNNER_TEMP/npm-stage-result.txt\"\n  printf '%s\\n' '```' 'Reviewed release (compare downloaded staged TGZ digest before approval):' '```json'\n  cat \"$RUNNER_TEMP/package-release/release.json\"\n  printf '%s\\n' '```'\n  printf 'Run %s attempt %s; reviewed artifact %s\\n' \"$GITHUB_RUN_ID\" \"$GITHUB_RUN_ATTEMPT\" \"$REVIEWED_ARTIFACT_ID\"\n} >> \"$GITHUB_STEP_SUMMARY\"\n",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/verify-package.yml",
+      "jobs": [
+        {
+          "job": "verify",
+          "condition": null,
+          "runs_on": "ubuntu-latest",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "condition": null
+            },
+            {
+              "name": "Install pinned pnpm",
+              "run": "npm install --global pnpm@10.29.3",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Install reviewed lockfile and backports",
+              "run": "pnpm install --frozen-lockfile",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Build validator and module before playground preparation",
+              "run": "pnpm run build:validator && pnpm run build:module",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Generate Nuxt playground types",
+              "run": "pnpm exec nuxt prepare playground",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Test APIs and dependency regression cases",
+              "run": "pnpm test",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Check types",
+              "run": "pnpm typecheck",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Build module and playground",
+              "run": "pnpm build",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Inspect actual archive inputs",
+              "run": "npm pack --ignore-scripts --json --pack-destination \"$RUNNER_TEMP\"",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Retain reviewed distribution archive",
+              "run": null,
+              "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": "pnpm exec playwright install --with-deps chromium",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Verify backports in a fresh packed consumer",
+              "run": "node .github/scripts/package-consumer-security.mjs \"$RUNNER_TEMP/nuxtjp-localized-site-0.2.2.tgz\" @nuxtjp/localized-site",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Exercise public showcase in an isolated archive consumer",
+              "run": "node .github/scripts/package-consumer.mjs \"$RUNNER_TEMP/nuxtjp-localized-site-0.2.2.tgz\"",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evidence_policy": "Declarations and source paths are not proof of an executed acceptance. Exact CI head and result are recorded separately. No live accounts or production acceptance is inferred."
+}
