@@ -9,7 +9,7 @@ if (!['module', 'verify'].includes(command) || !input || process.argv.length !==
   throw new Error('usage: workspace.mjs <module|verify> WORKSPACE_ROOT')
 }
 const root = resolve(input)
-const moduleRoot = join(root, 'organizations/nuxtjp/nuxt-localized-site')
+const moduleRoot = join(root, 'organizations/nuxtjp/site-builder')
 if (command === 'module') console.log(moduleRoot)
 else {
   for (const organization of readdirSync(join(root, 'organizations'), { withFileTypes: true })) {

@@ -11,10 +11,12 @@ import {
 } from '@nuxt/kit'
 import type { NuxtModule } from '@nuxt/schema'
 import type { ResolvedSiteConfig } from './contracts/types'
-import { siteRoutes } from './runtime/core/path'
+import { siteRoutes, localePath } from './runtime/core/path'
+import { loadOrganizationShowcase } from '../organization/index.mjs'
 
 export interface ModuleOptions {
   contentRoot?: string
+  maintenance?: boolean
 }
 
 interface ValidatorModule {
@@ -43,6 +45,11 @@ const localizedSiteModule: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOp
     const resolver = createResolver(import.meta.url)
     const pageFile = resolver.resolve('./runtime/app/pages/LocalizedContentPage.vue')
     const routes = siteRoutes(config)
+    const showcase = await loadOrganizationShowcase(resolve(nuxt.options.rootDir, options.contentRoot))
+    nuxt.options.runtimeConfig.public.nuxtJpOssShowcase = showcase ? JSON.stringify(showcase) : ''
+    const organizations = await loadOrganizationShowcase(resolve(nuxt.options.rootDir, options.contentRoot), 'organizations.json')
+    nuxt.options.runtimeConfig.public.nuxtJpOrganizationShowcase = organizations ? JSON.stringify(organizations) : ''
+    nuxt.options.runtimeConfig.public.nuxtJpMaintenanceEnabled = options.maintenance !== false
 
     nuxt.options.runtimeConfig.public.nuxtJpLocalizedSite = config
     addLayout(resolver.resolve('./runtime/app/layouts/localized-site.vue'), 'localized-site')
@@ -88,6 +95,22 @@ const localizedSiteModule: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOp
         })
       }
     })
+    if (showcase) {
+      const catalogRoutes = config.locales.flatMap(locale => [
+        localePath('/oss', locale, config),
+        ...showcase.entries.map(entry => localePath(`/oss/${entry.id}`, locale, config))
+      ])
+      extendPages(pages => {
+        const occupied = new Set(pages.map(page => page.path))
+        for (const [index, path] of catalogRoutes.entries()) {
+          if (occupied.has(path)) throw new Error(`Showcase route conflicts: ${path}`)
+          pages.push({ name: `nuxtjp-showcase-${index}`, path,
+            file: resolver.resolve('./runtime/app/pages/OssPage.vue'),
+            meta: { layout: 'localized-site' } })
+        }
+      })
+      addPrerenderRoutes(catalogRoutes)
+    }
     addPrerenderRoutes(routes)
     const stylesheet = resolver.resolve('./runtime/app/assets/localized-site.css')
     if (!nuxt.options.css.includes(stylesheet)) nuxt.options.css.push(stylesheet)

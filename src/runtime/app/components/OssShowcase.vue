@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { metricState, summarizeDownloads, validateShowcaseFeed } from '@nuxtjp/localized-site/showcase'
 import type { Locale } from '@nuxtjp/localized-site/showcase'
-const props = defineProps<{ feed: unknown; locale: Locale; now: number; maxAgeMs?: number; entryId?: string }>()
+const props = defineProps<{ feed: unknown; locale: Locale; now: number; maxAgeMs?: number; entryId?: string; kindLabel?: string }>()
 const feed = computed(() => validateShowcaseFeed(props.feed))
 const entries = computed(() => feed.value.entries.filter(entry => !props.entryId || entry.id === props.entryId))
 const groups = computed(() => summarizeDownloads({ ...feed.value, entries: entries.value }, props.now, props.maxAgeMs))
@@ -25,7 +25,7 @@ const labels = computed(() => props.locale === 'ja'
     </div>
     <div class="showcase-grid">
       <article v-for="entry in entries" :key="entry.id">
-        <p>{{ labels[entry.kind] }}<span v-if="entry.license"> · {{ entry.license }}</span></p>
+        <p>{{ kindLabel ?? labels[entry.kind] }}<span v-if="entry.license"> · {{ entry.license }}</span></p>
         <h2>{{ entry.name[locale] }}</h2><p>{{ entry.summary[locale] }}</p>
         <slot name="entry" :entry="entry"><a :href="entry.homepage">{{ labels.homepage }}</a></slot>
         <a v-if="entry.repository" :href="entry.repository">{{ labels.repository }}</a>
