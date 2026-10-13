@@ -78,3 +78,5 @@ See [dependency security backports](security/README.md) before installing this p
 Place a reviewed `nuxtjp://showcase/v1` public snapshot at the content root's `public/oss/showcase.json` to add localized `/oss` and `/oss/<entry-id>` pages. Reuse the existing validator, component and bounded registry collector. Pages never access provider accounts or registries; unavailable/stale values remain distinct from zero, and feedback links point to public owner source issues.
 
 Snapshots must be regular, bounded files without symlinks; route conflicts are rejected. The organization preset disables an absent maintenance endpoint rather than inventing health. General consumers retain the previous default and may explicitly use `maintenance: false`. Version 0.2.2 is a pre-publication candidate, pending reviewed hash and consumer acceptance.
+
+[OSS responsibility and source completion](docs/oss-source-contract.md) defines the supported package boundary and required acceptance. It does not declare unexecuted source, distribution or production checks complete.
