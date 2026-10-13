@@ -8,7 +8,7 @@ def require(condition, message):
 
 expected_repo = 'nuxtjp/site-builder'
 expected_name = '@nuxtjp/localized-site'
-expected_version = '0.2.1'
+expected_version = '0.2.2'
 mode = os.environ['RELEASE_MODE']
 sha = os.environ['GITHUB_SHA']
 if mode not in ('prepare', 'oidc'):
