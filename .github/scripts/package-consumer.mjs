@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict'
-import { mkdtempSync, writeFileSync, readFileSync, copyFileSync, cpSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, copyFileSync, cpSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { spawnSync, spawn } from 'node:child_process'
 import { createServer } from 'node:net'
 
 const archive = resolve(process.argv[2])
+const editorial = process.env.EDITORIAL_TEST_MODE
+assert.ok(!editorial || ['portfolio', 'organization'].includes(editorial))
 const root = mkdtempSync(join(tmpdir(), 'localized-site-consumer-'))
 const env = { ...process.env, NPM_CONFIG_CACHE: join(root, 'empty-cache'), CI: 'true', NUXT_TELEMETRY_DISABLED: '1' }
 for (const key of ['NPM_TOKEN', 'NODE_AUTH_TOKEN', 'GH_TOKEN', 'GITHUB_TOKEN']) delete env[key]
@@ -21,7 +23,17 @@ function run(command, args) {
 }
 run('npm', ['install', '--registry=https://registry.npmjs.org', '--no-audit', '--no-fund'])
 copyFileSync(join(root, 'node_modules/@nuxtjp/localized-site/examples/content/site.config.json'), join(root, 'site.config.json'))
-writeFileSync(join(root, 'nuxt.config.ts'), `export default defineNuxtConfig({ modules: [['@nuxtjp/localized-site', { contentRoot: '.' }]], devtools: { enabled: false }, nitro: { prerender: { ignore: ['/'] } } })`)
+const presentation = editorial ? `, presentation: {theme:'${editorial === 'portfolio' ? 'coela' : 'nuxtjp'}', scope:'${editorial}'}` : ''
+writeFileSync(join(root, 'nuxt.config.ts'), `export default defineNuxtConfig({ modules: [['@nuxtjp/localized-site', { contentRoot: '.' ${presentation} }]], devtools: { enabled: false }, nitro: { prerender: { ignore: ['/'] } } })`)
+if (editorial) {
+  const snapshot = JSON.parse(readFileSync(new URL('../../playground/data/showcase.json', import.meta.url)))
+  snapshot.observedAt = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
+  for (const entry of snapshot.entries) for (const metric of entry.metrics) metric.observedAt = snapshot.observedAt
+  mkdirSync(join(root, 'public/oss'), { recursive: true })
+  writeFileSync(join(root, 'public/oss/showcase.json'), JSON.stringify(snapshot))
+  const entry = { ...snapshot.entries.find(entry => entry.kind === 'product'), id: 'example-site' }
+  writeFileSync(join(root, 'public/oss/organizations.json'), JSON.stringify({ ...snapshot, entries: [entry] }))
+}
 writeFileSync(join(root, 'tsconfig.json'), JSON.stringify({ extends: './.nuxt/tsconfig.json' }))
 writeFileSync(join(root, 'smoke.mjs'), `
 import assert from 'node:assert/strict'
@@ -40,7 +52,7 @@ assert.equal(siteRoutes(config).length, 8)
 assert.equal(localePath('/docs?q=sample#main-content', 'en', config), '/en/docs?q=sample#main-content')
 assert.equal(maintenanceForService({}, 'sample-service'), null)
 `)
-cpSync(new URL('../../playground/pages', import.meta.url), join(root, 'app/pages'), { recursive: true })
+if (!editorial) cpSync(new URL('../../playground/pages', import.meta.url), join(root, 'app/pages'), { recursive: true })
 cpSync(new URL('../../playground/data', import.meta.url), join(root, 'app/data'), { recursive: true })
 writeFileSync(join(root, 'app/app.vue'), '<template><NuxtLayout><NuxtPage /></NuxtLayout></template>')
 run('node', ['smoke.mjs'])
@@ -78,7 +90,8 @@ try {
   for (const [name, item] of Object.entries(lock.packages)) {
     if (name && name !== 'node_modules/@nuxtjp/localized-site' && item.resolved) assert.ok(item.resolved.startsWith('https://registry.npmjs.org/'))
   }
-  run('node', [new URL('./showcase-browser.mjs', import.meta.url).pathname, base])
+  if (!editorial) run('node', [new URL('./showcase-browser.mjs', import.meta.url).pathname, base])
+  if (editorial) run('node', [new URL('./editorial-browser.mjs', import.meta.url).pathname, base, editorial])
   if (process.argv[3]) run('node', [resolve(process.argv[3]), root, base])
   console.log(JSON.stringify({ root, result: 'pass', actual_archive: archive, public_dependencies: true, routes_SSR: 8, unset_links: true, CLI: true, core_validator_import: true, typecheck: true, build: true }))
 } finally { server.kill('SIGTERM') }

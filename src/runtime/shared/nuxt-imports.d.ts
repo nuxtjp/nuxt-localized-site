@@ -16,6 +16,7 @@ declare module '#imports' {
       nuxtJpMaintenanceEnabled?: boolean
       nuxtJpOssShowcase?: string
       nuxtJpOrganizationShowcase?: string
+      nuxtJpPresentation?: import('../core/presentation').PresentationOptions | null
     }
   }
 }
