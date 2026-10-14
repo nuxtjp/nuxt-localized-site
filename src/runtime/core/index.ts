@@ -1,4 +1,6 @@
 export { defineLocalizedMessages, translatedMessage } from './messages'
+export { presentationThemes, validatePresentation } from './presentation'
+export type { PresentationOptions, PresentationTheme } from './presentation'
 export type { LocalizedMessages, MessageDictionary } from './messages'
 export {
   localeFromPath,

@@ -35,7 +35,7 @@ export function siteDirectory(root, key) {
   return path
 }
 
-export function organizationSite(configUrl, key = process.env.SITE_ID) {
+export function organizationSite(configUrl, key = process.env.SITE_ID, presentation) {
   const root = dirname(fileURLToPath(configUrl))
   const contentRoot = siteDirectory(root, key)
   return {
@@ -43,7 +43,7 @@ export function organizationSite(configUrl, key = process.env.SITE_ID) {
     devtools: { enabled: false },
     buildDir: join(root, '.nuxt', key),
     dir: { public: join(contentRoot, 'public') },
-    modules: [['@nuxtjp/localized-site', { contentRoot, maintenance: existsSync(join(contentRoot, 'public/maintenance.json')) }]],
+    modules: [['@nuxtjp/localized-site', { contentRoot, maintenance: existsSync(join(contentRoot, 'public/maintenance.json')), ...(presentation ? { presentation } : {}) }]],
     nitro: {
       output: { dir: join(root, '.output', key) },
       prerender: { failOnError: true }

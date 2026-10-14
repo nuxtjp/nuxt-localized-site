@@ -1,11 +1,11 @@
 export function organizationSites(root: string): string[];
 export function siteDirectory(root: string, key: string): string;
-export function organizationSite(configUrl: string, key?: string): {
+export function organizationSite(configUrl: string, key?: string, presentation?: import('../dist/runtime/core/presentation.js').PresentationOptions): {
   srcDir: string;
   devtools: { enabled: boolean };
   buildDir: string;
   dir: { public: string };
-  modules: [string, { contentRoot: string; maintenance: boolean }][];
+  modules: [string, { contentRoot: string; maintenance: boolean; presentation?: import('../dist/runtime/core/presentation.js').PresentationOptions }][];
   nitro: { output: { dir: string }; prerender: { failOnError: boolean } };
 };
 export function checkPublicCatalog(policy: unknown, catalog: unknown): { scope: string; entries: number };
