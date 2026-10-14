@@ -16,6 +16,8 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           persist-credentials: false
+      - name: Resolve archive names from current package manifests
+        run: python3 "$GITHUB_WORKSPACE/.github/scripts/archive_names.py"
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: '24.15.0'
@@ -45,6 +47,6 @@ jobs:
           retention-days: 7
       - run: pnpm exec playwright install --with-deps chromium
       - name: Verify backports in a fresh packed consumer
-        run: node .github/scripts/package-consumer-security.mjs "$RUNNER_TEMP/nuxtjp-localized-site-0.2.2.tgz" @nuxtjp/localized-site
+        run: node .github/scripts/package-consumer-security.mjs "$RUNNER_TEMP/${PACKAGE_ARCHIVE_NUXTJP_LOCALIZED_SITE_NPM}" @nuxtjp/localized-site
       - name: Exercise public showcase in an isolated archive consumer
-        run: node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/nuxtjp-localized-site-0.2.2.tgz"
+        run: node .github/scripts/package-consumer.mjs "$RUNNER_TEMP/${PACKAGE_ARCHIVE_NUXTJP_LOCALIZED_SITE_NPM}"
