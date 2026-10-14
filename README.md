@@ -9,7 +9,7 @@ Generate a Japanese/English introduction site from one validated configuration. 
 Install the published package version `0.1.4` from the official npm registry. Use Node.js 22.19+ or 24.11+, Nuxt 4.5.1+ in major 4, and Vue `^3.5.40`.
 
 ```sh
-pnpm add --save-exact @nuxtjp/localized-site@0.1.4 nuxt@4.5.1 vue@3.5.43
+pnpm add @nuxtjp/localized-site nuxt vue
 ```
 
 ```ts
@@ -80,3 +80,6 @@ Place a reviewed `nuxtjp://showcase/v1` public snapshot at the content root's `p
 Snapshots must be regular, bounded files without symlinks; route conflicts are rejected. The organization preset disables an absent maintenance endpoint rather than inventing health. General consumers retain the previous default and may explicitly use `maintenance: false`. Version 0.2.2 is a pre-publication candidate, pending reviewed hash and consumer acceptance.
 
 [OSS responsibility and source completion](docs/oss-source-contract.md) defines the supported package boundary and required acceptance. It does not declare unexecuted source, distribution or production checks complete.
+
+Dependency updates: [repository policy](docs/dependency-updates.md).
+Registry releases: [version tags and GitHub OIDC](docs/registry-release.md).

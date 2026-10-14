@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "repository": "nuxtjp/site-builder",
+  "defaultBranch": "main",
+  "requiredWorkflows": [
+    "oss-policy.yml",
+    "verify-package.yml"
+  ],
+  "packages": [
+    {
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "name": "@nuxtjp/localized-site",
+      "installDirectory": "."
+    }
+  ]
+}
