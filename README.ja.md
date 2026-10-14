@@ -9,7 +9,7 @@
 `0.1.0`はnpmで公開済みです。Node.js 22.19以降または24.11以降、Nuxt 4.5.1以降の4系、Vue `^3.5.40`を使用してください。
 
 ```sh
-pnpm add --save-exact @nuxtjp/localized-site@0.1.0 nuxt@4.5.1 vue@3.5.43
+pnpm add @nuxtjp/localized-site nuxt vue
 ```
 
 ```ts
@@ -76,3 +76,6 @@ content rootの `public/oss/showcase.json` に既存 `nuxtjp://showcase/v1` のr
 組織presetは公開maintenanceファイルがない場合にendpointを無効化します。一般consumerは既存defaultを維持し、`maintenance: false` で明示的に無効化できます。状態を創作してoperationalと表示しません。公開snapshotはregular file・上限262144bytes・symlink不可とし、ルート競合は拒否します。
 
 0.2.2は公開前のsource候補です。現行0.2.1のregistry公開と区別し、候補hash/consumer受入を確認後に公開します。
+
+Dependency updates: [repository policy](docs/dependency-updates.md).
+Registry releases: [version tags and GitHub OIDC](docs/registry-release.md).
