@@ -17,3 +17,7 @@ All consumers use the same `nuxtjp://showcase/v1` data contract. Each organizati
 Collection happens in trusted build/maintenance code via the existing public collectors, never browser account credentials. Retain source URLs, dates and coverage. Private registries, tokens and operational profiles do not enter snapshots. Use reviewed data updates and the ordinary version/tag/source CI paths for independent repositories.
 
 The common module owns layout, typography, catalog and aggregation. Personal narrative and project selection stay in the portfolio consumer; organization and service content stays with its owning site repository. A product LP can use its organization theme without moving proprietary source into the common module.
+
+## Independent site identity
+
+Organization and service sites own their brand, navigation, contact and security routes. Shared layouts must not add a Coela operator attribution or a mandatory link back to the personal portfolio. The portfolio may link outward to official sites and aggregate their public feeds. Required license, copyright and NOTICE attribution remains intact. Changing the shared source does not update published module versions or deployed consumers automatically.
