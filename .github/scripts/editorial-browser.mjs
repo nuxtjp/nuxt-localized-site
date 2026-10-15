@@ -11,15 +11,23 @@ try {
       await page.goto(`${base}${prefix || '/'}`)
       assert.equal(await page.locator('.editorial-shell').count(), 1)
       assert.equal(await page.locator('.editorial-hero').count(), 1)
-      await page.goto(`${base}${prefix}/oss`)
-      assert.equal(await page.locator('.editorial-catalog').count(), 1)
-      if (scope === 'portfolio') {
-        assert.equal(await page.locator('.organization-directory article').count(), 1)
-        assert.equal(await page.locator('[data-showcase="modules"]').count(), 0)
-        assert.equal((await page.request.get(`${base}${prefix}/oss/example-parser`)).status(), 404)
+      if (scope === 'product') {
+        assert.equal(await page.locator('.product-landing').count(), 1)
+        assert.equal(await page.locator('a[href$="/oss"]').count(), 0)
+        assert.equal(await page.locator('.editorial-adoption').count(), 0)
+        assert.ok(!(await page.locator('body').innerText()).includes('OPEN SOURCE'))
+        assert.equal(await page.locator('nav a[href$="/docs/getting-started"]').count(), 1)
       } else {
-        assert.equal(await page.locator('[data-showcase="modules"]').count(), 1)
-        assert.equal(await page.locator('.organization-directory').count(), 0)
+        await page.goto(`${base}${prefix}/oss`)
+        assert.equal(await page.locator('.editorial-catalog').count(), 1)
+        if (scope === 'portfolio') {
+          assert.equal(await page.locator('.organization-directory article').count(), 1)
+          assert.equal(await page.locator('[data-showcase="modules"]').count(), 0)
+          assert.equal((await page.request.get(`${base}${prefix}/oss/example-parser`)).status(), 404)
+        } else {
+          assert.equal(await page.locator('[data-showcase="modules"]').count(), 1)
+          assert.equal(await page.locator('.organization-directory').count(), 0)
+        }
       }
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
     }

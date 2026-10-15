@@ -7,7 +7,7 @@ import { createServer } from 'node:net'
 
 const archive = resolve(process.argv[2])
 const editorial = process.env.EDITORIAL_TEST_MODE
-assert.ok(!editorial || ['portfolio', 'organization'].includes(editorial))
+assert.ok(!editorial || ['portfolio', 'organization', 'product'].includes(editorial))
 const root = mkdtempSync(join(tmpdir(), 'localized-site-consumer-'))
 const env = { ...process.env, NPM_CONFIG_CACHE: join(root, 'empty-cache'), CI: 'true', NUXT_TELEMETRY_DISABLED: '1' }
 for (const key of ['NPM_TOKEN', 'NODE_AUTH_TOKEN', 'GH_TOKEN', 'GITHUB_TOKEN']) delete env[key]
@@ -33,6 +33,7 @@ if (editorial) {
   writeFileSync(join(root, 'public/oss/showcase.json'), JSON.stringify(snapshot))
   const entry = { ...snapshot.entries.find(entry => entry.kind === 'product'), id: 'example-site' }
   writeFileSync(join(root, 'public/oss/organizations.json'), JSON.stringify({ ...snapshot, entries: [entry] }))
+  if (editorial === 'product') for (const name of ['showcase.json', 'organizations.json']) writeFileSync(join(root, 'public/oss', name), 'unused invalid OSS feed')
 }
 writeFileSync(join(root, 'tsconfig.json'), JSON.stringify({ extends: './.nuxt/tsconfig.json' }))
 writeFileSync(join(root, 'smoke.mjs'), `
@@ -86,6 +87,7 @@ try {
     }
   }
   assert.equal((await fetch(base + '/missing-page')).status, 404)
+  if (editorial === 'product') for (const prefix of ['', '/en']) assert.equal((await fetch(base + prefix + '/oss')).status, 404)
   const lock = JSON.parse(readFileSync(join(root, 'package-lock.json'), 'utf8'))
   for (const [name, item] of Object.entries(lock.packages)) {
     if (name && name !== 'node_modules/@nuxtjp/localized-site' && item.resolved) assert.ok(item.resolved.startsWith('https://registry.npmjs.org/'))

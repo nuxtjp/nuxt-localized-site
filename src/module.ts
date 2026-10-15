@@ -52,7 +52,7 @@ const localizedSiteModule: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOp
     nuxt.options.runtimeConfig.public.nuxtJpPresentation = presentation
     const showcase = presentation?.scope === 'product' ? null : await loadOrganizationShowcase(resolve(nuxt.options.rootDir, options.contentRoot))
     nuxt.options.runtimeConfig.public.nuxtJpOssShowcase = showcase ? JSON.stringify(showcase) : ''
-    const organizations = await loadOrganizationShowcase(resolve(nuxt.options.rootDir, options.contentRoot), 'organizations.json')
+    const organizations = presentation?.scope === 'product' ? null : await loadOrganizationShowcase(resolve(nuxt.options.rootDir, options.contentRoot), 'organizations.json')
     nuxt.options.runtimeConfig.public.nuxtJpOrganizationShowcase = organizations ? JSON.stringify(organizations) : ''
     nuxt.options.runtimeConfig.public.nuxtJpMaintenanceEnabled = options.maintenance !== false
 
