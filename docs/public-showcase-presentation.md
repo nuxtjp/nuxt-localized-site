@@ -21,3 +21,14 @@ The common module owns layout, typography, catalog and aggregation. Personal nar
 ## Independent site identity
 
 Organization and service sites own their brand, navigation, contact and security routes. Shared layouts must not add a Coela operator attribution or a mandatory link back to the personal portfolio. The portfolio may link outward to official sites and aggregate their public feeds. Required license, copyright and NOTICE attribution remains intact. Changing the shared source does not update published module versions or deployed consumers automatically.
+
+## Product sites
+
+Use `presentation: { theme: 'nerp', scope: 'product' }` for product-led sites.
+The header prioritizes features/guides and getting started/download information.
+The landing page shows product use cases, capabilities and introduction status from
+localized content. Public OSS snapshots, `/oss` pages and package adoption metrics
+are not loaded/generated in this scope. Actual released downloads must be described
+by the owning site; the shared module invents neither artifacts nor availability.
+Proprietary products can use this presentation without exposing source or becoming OSS.
+Portfolio and OSS organization modes retain their own navigation and aggregation.

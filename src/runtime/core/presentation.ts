@@ -13,10 +13,10 @@ export const presentationThemes = {
   semantic: { accent: '#0866cd', paper: '#f4f8ff', ink: '#102d46' }
 } as const
 export type PresentationTheme = keyof typeof presentationThemes
-export interface PresentationOptions { theme: PresentationTheme; scope: 'portfolio' | 'organization' }
+export interface PresentationOptions { theme: PresentationTheme; scope: 'portfolio' | 'organization' | 'product' }
 export function validatePresentation(input: PresentationOptions | undefined) {
   if (!input) return null
-  if (!Object.hasOwn(presentationThemes, input.theme) || !['portfolio', 'organization'].includes(input.scope)
+  if (!Object.hasOwn(presentationThemes, input.theme) || !['portfolio', 'organization', 'product'].includes(input.scope)
     || Object.keys(input).some(key => !['theme', 'scope'].includes(key))) throw new Error('Invalid presentation options')
   return { theme: input.theme, scope: input.scope }
 }
