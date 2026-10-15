@@ -1,16 +1,16 @@
 export const presentationThemes = {
-  coela: { accent: '#304dcb', paper: '#faf8f3', ink: '#242823' },
-  nuxtjp: { accent: '#087c54', paper: '#f5faf7', ink: '#172e26' },
-  vpremises: { accent: '#87562d', paper: '#faf6ef', ink: '#302a25' },
-  zixcel: { accent: '#375bc3', paper: '#f6f7fc', ink: '#242d42' },
-  crowsi: { accent: '#46753a', paper: '#f5f8f1', ink: '#253023' },
+  coela: { accent: '#007e78', paper: '#f3fbf9', ink: '#102d46' },
+  nuxtjp: { accent: '#00875f', paper: '#f4fbf8', ink: '#102d46' },
+  vpremises: { accent: '#087f78', paper: '#f3fbfa', ink: '#102d46' },
+  zixcel: { accent: '#0866cd', paper: '#f4f8ff', ink: '#102d46' },
+  crowsi: { accent: '#1464a4', paper: '#f4f8fc', ink: '#102d46' },
   incusjp: { accent: '#7041a4', paper: '#faf7fd', ink: '#30243e' },
-  tparty: { accent: '#aa3b44', paper: '#fff7f4', ink: '#3c2528' },
+  tparty: { accent: '#087e79', paper: '#f3faf8', ink: '#102d46' },
   hibee: { accent: '#956518', paper: '#fffbf0', ink: '#393023' },
-  constillo: { accent: '#426a7c', paper: '#f5f9fa', ink: '#26343b' },
-  hathq: { accent: '#985236', paper: '#faf7f3', ink: '#342922' },
-  nerp: { accent: '#306d81', paper: '#f4f9fb', ink: '#24353d' },
-  semantic: { accent: '#755795', paper: '#faf7fc', ink: '#31283d' }
+  constillo: { accent: '#6435c9', paper: '#faf8ff', ink: '#102d46' },
+  hathq: { accent: '#007baa', paper: '#f4faff', ink: '#102d46' },
+  nerp: { accent: '#6740c7', paper: '#faf8ff', ink: '#102d46' },
+  semantic: { accent: '#0866cd', paper: '#f4f8ff', ink: '#102d46' }
 } as const
 export type PresentationTheme = keyof typeof presentationThemes
 export interface PresentationOptions { theme: PresentationTheme; scope: 'portfolio' | 'organization' }
