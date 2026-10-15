@@ -50,7 +50,7 @@ const localizedSiteModule: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOp
     const presentation = validatePresentation(options.presentation)
     const layout = presentation ? 'editorial-site' : 'localized-site'
     nuxt.options.runtimeConfig.public.nuxtJpPresentation = presentation
-    const showcase = await loadOrganizationShowcase(resolve(nuxt.options.rootDir, options.contentRoot))
+    const showcase = presentation?.scope === 'product' ? null : await loadOrganizationShowcase(resolve(nuxt.options.rootDir, options.contentRoot))
     nuxt.options.runtimeConfig.public.nuxtJpOssShowcase = showcase ? JSON.stringify(showcase) : ''
     const organizations = await loadOrganizationShowcase(resolve(nuxt.options.rootDir, options.contentRoot), 'organizations.json')
     nuxt.options.runtimeConfig.public.nuxtJpOrganizationShowcase = organizations ? JSON.stringify(organizations) : ''
