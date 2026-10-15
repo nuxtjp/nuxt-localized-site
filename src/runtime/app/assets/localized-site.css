@@ -1,4 +1,6 @@
 :root {
+  --site-header-offset: 9rem;
+  scroll-padding-top: var(--site-header-offset);
   color-scheme: light;
   font-family: Inter, "Noto Sans JP", system-ui, sans-serif;
   color: #18202a;
@@ -23,6 +25,11 @@ body {
 }
 
 .nls-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  align-self: start;
+  background: var(--brand-paper, var(--product-paper, #f6f7f9));
   display: flex;
   gap: 1.25rem;
   align-items: center;
@@ -117,4 +124,8 @@ body {
 a {
   color: #174d75;
   text-underline-offset: 0.2em;
+}
+
+@media (max-width: 640px) {
+  :root { --site-header-offset: 15rem; }
 }
