@@ -20,6 +20,6 @@ const style = { '--editorial-accent': palette.accent, '--editorial-paper': palet
       </nav>
     </header>
     <main id="main-content" class="editorial-wrap editorial-main"><NuxtJpPublicMaintenanceNotice /><slot /></main>
-    <footer class="editorial-footer editorial-wrap"><strong>{{ site.content.value.brand }}</strong><NuxtLink :to="site.localePath(site.locale.value, '/docs')">{{ ja ? 'ガイド' : 'Guide' }}</NuxtLink><a v-if="presentation.scope === 'organization'" href="https://coela.org">Coela ↗</a><span v-else>{{ ja ? 'Coelaの視点で選ぶ、コードとアイデア。' : 'Code and ideas, from Coela’s perspective.' }}</span></footer>
+    <footer class="editorial-footer editorial-wrap"><strong>{{ site.content.value.brand }}</strong><NuxtLink :to="site.localePath(site.locale.value, '/docs')">{{ ja ? 'ガイド' : 'Guide' }}</NuxtLink><span v-if="presentation.scope === 'portfolio'">{{ ja ? 'Coelaの視点で選ぶ、コードとアイデア。' : 'Code and ideas, from Coela’s perspective.' }}</span></footer>
   </div>
 </template>
