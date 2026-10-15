@@ -17,8 +17,8 @@ const style = { '--editorial-accent': palette.accent, '--editorial-paper': palet
         <NuxtLink :to="site.localePath(site.locale.value, '/')">{{ ja ? '紹介' : 'About' }}</NuxtLink>
         <NuxtLink v-if="presentation.scope !== 'product'" :to="site.localePath(site.locale.value, '/oss')">{{ ja ? 'OSS' : 'OSS' }}</NuxtLink>
         <template v-if="presentation.scope === 'product'">
-          <NuxtLink :to="site.localePath(site.locale.value, '/docs')">{{ ja ? '機能・ガイド' : 'Features & guide' }}</NuxtLink>
-          <NuxtLink :to="site.localePath(site.locale.value, '/docs/getting-started')">{{ ja ? '導入・ダウンロード' : 'Get started & download' }}</NuxtLink>
+          <NuxtLink :to="site.localePath(site.locale.value, '/docs')">{{ ja ? '機能・ガイド' : 'Guide' }}</NuxtLink>
+          <NuxtLink :to="site.localePath(site.locale.value, '/docs/getting-started')">{{ ja ? '導入・ダウンロード' : 'Download' }}</NuxtLink>
         </template>
         <NuxtJpLocalizedLanguageSwitcher />
       </nav>
